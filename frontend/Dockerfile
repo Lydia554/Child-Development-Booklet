@@ -4,6 +4,9 @@ FROM node:18-alpine AS build
 # 2. Postavi radni direktorijum
 WORKDIR /app
 
+RUN chmod +x node_modules/.bin/vue-cli-service
+
+
 # 3. Kopiraj package.json i package-lock.json i instaliraj zavisnosti
 COPY package.json package-lock.json ./
 RUN npm install

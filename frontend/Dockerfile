@@ -1,31 +1,26 @@
-# 1. Koristi Node.js za build fazu
-FROM node:18-alpine AS build
+# Use an official Node.js image as a base
+FROM node:18 AS build
 
-# 2. Postavi radni direktorijum
+# Set working directory
 WORKDIR /app
 
-RUN chmod +x node_modules/.bin/vue-cli-service
-
-
-# 3. Kopiraj package.json i package-lock.json i instaliraj zavisnosti
+# Copy package.json and package-lock.json first (this helps with caching)
 COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
-# 4. Kopiraj ceo projekat i napravi build
-COPY . ./
+# Ensure `vue-cli-service` exists
+RUN ls -l node_modules/.bin/ && chmod +x node_modules/.bin/vue-cli-service
+
+# Copy the rest of the application
+COPY . .
+
+# Build the frontend
 RUN npm run build
 
-# 5. Serviraj build fajlove sa Nginx-om
-FROM nginx:alpine
+# Expose port 3000
+EXPOSE 3000
 
-# 6. Kopiraj build fajlove u Nginx root direktorijum
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# 7. Kopiraj Nginx konfiguraciju
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# 8. Otvori port 80
-EXPOSE 80
-
-# 9. Pokreni Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["npm", "start"]

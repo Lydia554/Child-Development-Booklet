@@ -1,17 +1,16 @@
-# Use an official Node.js image as a base
+# Use an official Node.js image
 FROM node:18 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (helps with caching)
+# Copy package.json and package-lock.json first (caching trick)
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Set NPM registry to avoid timeouts
+RUN npm config set registry https://registry.npmjs.org/
 
-# Fix permission issue for vue-cli-service
-RUN chmod +x node_modules/.bin/vue-cli-service
+# Run NPM install with retry logic
+RUN npm install || npm install || npm install
 
 # Copy the rest of the application
 COPY . .
@@ -19,8 +18,7 @@ COPY . .
 # Build the frontend
 RUN npm run build
 
-# Expose port 3000
+# Expose port
 EXPOSE 3000
 
-# Start the application
 CMD ["npm", "start"]

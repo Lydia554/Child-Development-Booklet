@@ -7,13 +7,21 @@ WORKDIR /app
 # Copy package.json and package-lock.json first
 COPY package.json package-lock.json ./
 
+# Install dependencies
 RUN npm install --legacy-peer-deps
-COPY . . 
+
+# Copy the rest of the application
+COPY . .
+
+# Fix Vue CLI permissions
+RUN chmod +x node_modules/.bin/vue-cli-service
+
+# Build the Vue.js frontend
 RUN npm run build
 
-# Serve frontend with a static server
+# Install a static file server for serving the frontend
 RUN npm install -g serve
 CMD ["serve", "-s", "dist"]
 
-# Expose port 8080 for frontend
+# Expose port 8080 for the frontend
 EXPOSE 8080

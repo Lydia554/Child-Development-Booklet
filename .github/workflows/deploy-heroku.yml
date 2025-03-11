@@ -3,7 +3,7 @@ name: Deploy to Heroku (Docker)
 on:
   push:
     branches:
-      - main  # Change this if you're using a different branch
+      - main  
 
 jobs:
   deploy:

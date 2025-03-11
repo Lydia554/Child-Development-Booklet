@@ -1,5 +1,8 @@
 build:
   docker:
-    web: ./Dockerfile
+    web: backend/Dockerfile  # This will use the backend's Dockerfile
+    frontend: frontend/Dockerfile  # This will use the frontend's Dockerfile
+
 run:
-  web: npm start
+  web: npm start  # Runs the backend
+  frontend: serve -s dist -l 8080  # Runs the frontend

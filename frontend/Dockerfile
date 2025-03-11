@@ -1,27 +1,19 @@
-# Use an official Node.js image as a base
+# Use Node.js as the base image
 FROM node:18 AS build
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
+# Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install --legacy-peer-deps
 
-# Copy the rest of the application
+# Copy all files and build the Vue app
 COPY . .
-
-# Fix Vue CLI permissions
-RUN chmod +x node_modules/.bin/vue-cli-service
-
-# Build the Vue.js frontend
 RUN npm run build
 
-# Install a static file server for serving the frontend
-RUN npm install -g serve
-CMD ["serve", "-s", "dist"]
-
-# Expose port 8080 for the frontend   
+# Use a lightweight server to serve the built files
 EXPOSE 8080
+CMD ["npx", "serve", "-s", "dist", "-l", "8080"]

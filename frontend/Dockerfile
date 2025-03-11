@@ -1,22 +1,20 @@
-# Use an official Node.js image as a base
-FROM node:18 AS build
+# 1. Use a lightweight Node.js image
+FROM node:18-alpine
 
-# Set working directory
+# 2. Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (helps with caching)
+# 3. Copy package.json and package-lock.json first
 COPY package.json package-lock.json ./
 
+# 4. Install dependencies
 RUN npm install --legacy-peer-deps
+
+# 5. Copy application source code
 COPY . .
-RUN npm run build
 
+# 6. Expose port 5000
+EXPOSE 5000
 
-# Fix permission issue for Vue CLI
-RUN chmod +x node_modules/.bin/vue-cli-service || true
-
-
-# Expose port
-EXPOSE 3000
-
-CMD ["npm", "start"]
+# 7. Use environment variable for PORT (required for Heroku)
+CMD ["node", "server.js"]

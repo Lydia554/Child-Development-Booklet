@@ -20,6 +20,11 @@ app.use('/api/milestones', milestoneRoutes);
 app.use('/api', childRoutes); 
 app.use('/api/child-development', developmentRoutes);  
 
+// ✅ ADD THIS: Default route to prevent 404 error on Heroku
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running on Heroku!");
+});
+
 console.log("MONGO_URI iz .env:", process.env.MONGO_URI);
 
 mongoose.connect(process.env.MONGO_URI, {

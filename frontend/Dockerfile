@@ -1,20 +1,27 @@
-# 1. Use a lightweight Node.js image
-FROM node:18-alpine
+# Use an official Node.js image as a base
+FROM node:18 AS build
 
-# 2. Set working directory
+# Set working directory
 WORKDIR /app
 
-# 3. Copy package.json and package-lock.json first
+# Copy package.json and package-lock.json first
 COPY package.json package-lock.json ./
 
-# 4. Install dependencies
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
-# 5. Copy application source code
+# Copy the rest of the application
 COPY . .
 
-# 6. Expose port 5000
-EXPOSE 5000
+# Fix Vue CLI permissions
+RUN chmod +x node_modules/.bin/vue-cli-service
 
-# 7. Use environment variable for PORT (required for Heroku)
-CMD ["node", "server.js"]
+# Build the Vue.js frontend
+RUN npm run build
+
+# Install a static file server for serving the frontend
+RUN npm install -g serve
+CMD ["serve", "-s", "dist"]
+
+# Expose port 8080 for the frontend   
+EXPOSE 8080

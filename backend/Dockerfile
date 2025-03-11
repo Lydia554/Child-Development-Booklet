@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Use an official Node.js image as a base
 FROM node:18 AS build
 
@@ -25,3 +26,23 @@ CMD ["serve", "-s", "dist"]
 
 # Expose port 8080 for the frontend
 EXPOSE 8080
+=======
+# Use a Node.js base image
+FROM node:18
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps
+
+# Copy the application source code
+COPY . .
+
+# Expose backend port
+EXPOSE 5000
+
+# Start the backend server
+CMD ["node", "server.js"]
+>>>>>>> d6370f801ffc4624259b63d5b375b22b93566ac9

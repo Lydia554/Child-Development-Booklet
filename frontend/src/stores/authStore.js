@@ -16,11 +16,11 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     login(token, childId = null) {
       if (!token) {
-        console.error("❌ Trying to store an undefined token!");
+        console.error("❌ Pokušaj da se sačuva undefined token!");
         return;
       }
 
-      console.log("🔑 Storing token in authStore:", token);
+      console.log("🔑 Čuvanje tokena u authStore:", token);
       this.isAuthenticated = true;
       this.token = token;
       sessionStorage.setItem('token', token); 
@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     logout() {
-      console.log("🚪 Logging out, clearing token...");
+      console.log("🚪 Odjava, brisanje tokena...");
       this.isAuthenticated = false;
       this.token = null;
       this.childIds = [];
@@ -48,13 +48,13 @@ export const useAuthStore = defineStore('auth', {
       const childIds = JSON.parse(sessionStorage.getItem('childIds') || '[]');
 
       if (token) {
-        console.log("✅ Token found in sessionStorage:", token);
+        console.log("✅ Token pronađen u sessionStorage:", token);
         this.isAuthenticated = true;
         this.token = token;
         this.childIds = childIds;
         this.currentChildId = childId || null;
       } else {
-        console.warn("⚠️ No token found in sessionStorage.");
+        console.warn("⚠️ Token nije pronađen u sessionStorage.");
       }
     },
 

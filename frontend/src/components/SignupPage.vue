@@ -114,6 +114,7 @@ export default {
       }
 
       try {
+     
         const registerResponse = await axios.post('https://child-development-backend.fly.dev/api/users/register', {
           name: this.name,
           email: this.email,
@@ -124,16 +125,18 @@ export default {
           }
         });
 
-        console.log('Registration successful:', registerResponse.data);
+        console.log('Registracija uspešna:', registerResponse.data);
 
+     
         const loginResponse = await axios.post('https://child-development-backend.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
         });
 
         const token = loginResponse.data.token;
-        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('token', token); 
 
+      
         const authStore = useAuthStore();
         authStore.login(token);
 
@@ -143,9 +146,9 @@ export default {
         console.error('Greška pri registraciji:', error);
         if (error.response) {
           console.log('Error response data:', error.response.data);
-          this.errorMessage = error.response.data.message || 'Server error occurred';
+          this.errorMessage = error.response.data.message || 'Došlo je do greške na serveru';
         } else if (error.request) {
-          this.errorMessage = 'No response from server';
+          this.errorMessage = 'Nema odgovora od servera';
         } else {
           this.errorMessage = error.message;
         }
@@ -158,6 +161,7 @@ export default {
   }
 };
 </script>
+
 
 <style lang="scss" scoped>
 $primary-color: #007bff;

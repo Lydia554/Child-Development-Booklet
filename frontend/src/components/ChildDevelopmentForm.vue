@@ -125,7 +125,14 @@ export default {
           }
         );
 
-        this.$router.push({ path: '/child-development-list' });
+        
+        this.$router.push({
+          path: `/child-development-list/${childId}`, 
+          query: {
+            periodStart: this.selectedPeriod.start,
+            periodEnd: this.selectedPeriod.end
+          }
+        });
       } catch (error) {
         console.error("❌ Error saving development:", error);
         this.error = "There was an error saving the development data.";
@@ -276,6 +283,7 @@ export default {
 </script>
 
 
+
 <style lang="scss" scoped>
 $primary-color: #4CAF50;
 $primary-disabled: #cccccc;
@@ -284,10 +292,10 @@ $error-text: red;
 $border-color: #ddd;
 $text-color: #333;
 $background-light: #ffffff;
+$max-width: 900px; 
 
 .development-form {
-  max-width: 800px;
-  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
@@ -295,42 +303,75 @@ $background-light: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: $background-light;
+}
+
+h2 {
+  font-size: 1.5rem;
+  text-align: center;
+  color: $text-color;
+}
+
+h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 10px 0;
+  color: $text-color;
+}
+
+.error-message {
+  color: $error-text;
+  background-color: $error-bg;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  text-align: center;
+  width: 100%;
+}
+
+form {
+  width: 100%;
+  max-width: $max-width;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
 label {
-  display: block;
+  font-size: 1rem;
   margin-bottom: 5px;
-  font-weight: bold;
   color: $text-color;
-  font-size: 1.4rem;
 }
 
 textarea {
   width: 100%;
-  min-height: 250px;
-  padding: 20px;
+  min-height: 120px;
+  padding: 12px;
   border: 1px solid $border-color;
   border-radius: 4px;
-  font-size: 1.4rem;
-  resize: vertical;
+  font-size: 1rem;
   box-sizing: border-box;
+  resize: vertical;
 }
 
 button {
-  padding: 15px 20px;
+  padding: 12px 20px;
   background-color: $primary-color;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1.4rem;
+  font-size: 1rem;
   transition: background-color 0.3s ease;
   width: 100%;
+  text-align: center;
 
   &:hover {
     background-color: darken($primary-color, 10%);
@@ -342,35 +383,32 @@ button {
   }
 }
 
-.error-message {
-  color: $error-text;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: $error-bg;
-  border-radius: 4px;
-  text-align: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 /* 📱 Mobile Styles: Optimized for Phones */
 @media (max-width: 768px) {
   .development-form {
     padding: 15px;
-    width: 100%;
+    width: 100%; 
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
   }
 
   label {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
   }
 
   textarea {
-    font-size: 1.2rem;
-    padding: 15px;
+    font-size: 0.95rem;
+    padding: 10px;
   }
 
   button {
-    font-size: 1.2rem;
+    font-size: 1rem;
     padding: 14px;
   }
 }
@@ -381,17 +419,25 @@ button {
     padding: 12px;
   }
 
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  h3 {
+    font-size: 0.95rem;
+  }
+
   label {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   textarea {
-    font-size: 1rem;
-    padding: 12px;
+    font-size: 0.9rem;
+    padding: 8px;
   }
 
   button {
-    font-size: 1rem;
+    font-size: 0.95rem;
     padding: 12px;
   }
 }
@@ -402,13 +448,21 @@ button {
     padding: 10px;
   }
 
+  h2 {
+    font-size: 1rem;
+  }
+
+  h3 {
+    font-size: 0.85rem;
+  }
+
   label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   textarea {
-    font-size: 0.9rem;
-    padding: 10px;
+    font-size: 0.85rem;
+    padding: 8px;
   }
 
   button {
@@ -416,4 +470,5 @@ button {
     padding: 10px;
   }
 }
+
 </style>

@@ -117,7 +117,6 @@ export default {
           console.log("📤 Saving development data:", periodData);
         }
 
-       
         await axios.post(
           `https://child-development-backend.fly.dev/api/child-development/${childId}`,
           periodData,
@@ -126,7 +125,6 @@ export default {
           }
         );
 
-        
         this.$router.push({ path: '/child-development-list' });
       } catch (error) {
         console.error("❌ Error saving development:", error);
@@ -173,7 +171,7 @@ export default {
         );
 
         this.developmentData = response.data || [];
-        
+
         if (process.env.NODE_ENV !== 'production') {
           console.log("📊 Development data:", this.developmentData);
         }
@@ -197,7 +195,7 @@ export default {
         );
 
         this.milestoneData = response.data || [];
-        
+
         if (process.env.NODE_ENV !== 'production') {
           console.log("✅ Fetched Milestones:", this.milestoneData);
         }
@@ -225,7 +223,7 @@ export default {
 
       const filteredMilestones = this.milestoneData.filter(milestone => {
         const milestoneDate = new Date(milestone.milestoneDate);
-      
+
         if (process.env.NODE_ENV !== 'production') {
           console.log(`🔍 Checking Milestone: ${milestone.milestoneType} - ${milestoneDate.toISOString()}`);
         }
@@ -283,15 +281,15 @@ $text-color: #333;
 $background-light: #ffffff;
 
 .development-form {
-  max-width: 100%; 
-  width: 100%; 
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 }
 
 .form-group {
@@ -304,30 +302,30 @@ label {
   margin-bottom: 5px;
   font-weight: bold;
   color: $text-color;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 textarea {
   width: 100%;
-  min-height: 160px;  
-  padding: 12px;
+  min-height: 200px;
+  padding: 15px;
   border: 1px solid $border-color;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 1.2rem;
   resize: vertical;
   box-sizing: border-box;
 }
 
 button {
-  padding: 12px 20px;
+  padding: 15px 20px;
   background-color: $primary-color;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.2rem;
   transition: background-color 0.3s ease;
-  width: 100%; 
+  width: 100%;
 
   &:hover {
     background-color: darken($primary-color, 10%);
@@ -346,7 +344,7 @@ button {
   background-color: $error-bg;
   border-radius: 4px;
   text-align: center;
-  width: 100%; 
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -354,7 +352,28 @@ button {
 @media (max-width: 768px) {
   .development-form {
     padding: 15px;
-    width: 100%; 
+    width: 100%;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+
+  textarea {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  button {
+    font-size: 1.1rem;
+    padding: 14px;
+  }
+}
+
+/* 📱 Extra Small Mobile Screens (Max 480px) */
+@media (max-width: 480px) {
+  .development-form {
+    padding: 12px;
   }
 
   label {
@@ -368,27 +387,6 @@ button {
 
   button {
     font-size: 1rem;
-    padding: 14px;
-  }
-}
-
-/* 📱 Extra Small Mobile Screens (Max 480px) */
-@media (max-width: 480px) {
-  .development-form {
-    padding: 12px;
-  }
-
-  label {
-    font-size: 0.9rem;
-  }
-
-  textarea {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
-
-  button {
-    font-size: 0.95rem;
     padding: 12px;
   }
 }

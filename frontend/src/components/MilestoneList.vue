@@ -103,7 +103,6 @@ export default {
 </script>
 
 
-
 <style lang="scss" scoped>
 $primary-color: #007bff;
 $primary-hover: #0056b3;
@@ -124,7 +123,7 @@ $gap-size: 15px;
   background-color: $light-gray;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
+  overflow-x: hidden;  
   h2 {
     text-align: center;
     font-size: 24px;
@@ -160,6 +159,7 @@ $gap-size: 15px;
       gap: 10px;
       margin-top: 15px;
       flex-wrap: wrap;
+      justify-content: center; 
     }
 
     .edit-btn,
@@ -171,6 +171,8 @@ $gap-size: 15px;
       font-weight: 500;
       transition: all 0.3s ease;
       text-align: center;
+      width: auto;
+      max-width: 100%;
     }
 
     .edit-btn {
@@ -210,6 +212,7 @@ $gap-size: 15px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
     text-align: center;
+    width: 100%; 
 
     &:hover {
       background-color: $primary-hover;

@@ -1,8 +1,10 @@
 <template>
   <div class="development-form">
     <h2>Unos Razvoja Deteta</h2>
-    <h3>Trenutni period: {{ currentPeriod.startAge }} - {{ currentPeriod.endAge }} meseci</h3>
-    <h3>Trenutna starost deteta: {{ childAgeInMonths }} meseci</h3>
+
+    <!-- Ensure currentPeriod is defined before accessing its properties -->
+    <h3 v-if="currentPeriod">Trenutni period: {{ currentPeriod.startAge }} - {{ currentPeriod.endAge }} meseci</h3>
+    <h3 v-if="childAgeInMonths">Trenutna starost deteta: {{ childAgeInMonths }} meseci</h3>
 
     <div v-if="error" class="error-message">
       {{ error }}
@@ -40,6 +42,7 @@
   </div>
 </template>
 
+
 <script>
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
@@ -54,11 +57,20 @@ export default {
       availablePeriods: [],
       selectedPeriod: null,
       childBirthDate: null,
+      error: null,
+      loading: false,
+      hasErrors: false,
+      formData: {
+        physicalDevelopment: '',
+        emotionalDevelopment: '',
+        intellectualDevelopment: '',
+        socialDevelopment: ''
+      }
     };
   },
 
   computed: {
-    currentPeriodDevelopment() {
+    currentPeriod() {
       return this.selectedPeriod
         ? this.developmentData.find(
             (d) =>
@@ -68,16 +80,9 @@ export default {
         : null;
     },
 
-    currentPeriodMilestones() {
-      if (!this.selectedPeriod) return [];
-
-      const milestones = this.getMilestonesForPeriod(this.selectedPeriod);
-      
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("📢 Current Period Milestones:", milestones);
-      }
-      return milestones;
-    },
+    childAgeInMonths() {
+      return this.childAge;
+    }
   },
 
   methods: {
@@ -85,6 +90,7 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
+
        
         if (process.env.NODE_ENV !== 'production') {
           console.log("🔍 Fetching child data for:", childId);
@@ -109,7 +115,7 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-        
+
         if (process.env.NODE_ENV !== 'production') {
           console.log("📢 Fetching development data for:", childId);
         }
@@ -120,6 +126,10 @@ export default {
         );
 
         this.developmentData = response.data || [];
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📊 Development data:", this.developmentData);
+        }
       } catch (error) {
         console.error("❌ Error fetching development data:", error);
       }
@@ -129,7 +139,8 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-       
+
+        
         if (process.env.NODE_ENV !== 'production') {
           console.log("📢 Fetching milestones for:", childId);
         }
@@ -162,7 +173,7 @@ export default {
       const endDate = new Date(birthDate);
       endDate.setMonth(endDate.getMonth() + period.end);
 
-      
+     
       if (process.env.NODE_ENV !== 'production') {
         console.log(`🔎 Filtering milestones between ${startDate.toISOString()} - ${endDate.toISOString()}`);
       }
@@ -177,7 +188,6 @@ export default {
         return milestoneDate >= startDate && milestoneDate < endDate;
       });
 
-      
       if (process.env.NODE_ENV !== 'production') {
         console.log("📌 Matched Milestones for Period:", filteredMilestones);
       }
@@ -213,6 +223,7 @@ export default {
 
     async selectPeriod(period) {
       this.selectedPeriod = period;
+
       
       if (process.env.NODE_ENV !== 'production') {
         console.log("🔍 Selected Period:", period);
@@ -296,7 +307,7 @@ export default {
         return;
       }
 
-      
+     
       if (process.env.NODE_ENV !== 'production') {
         console.log("✏️ Editing development:", developmentData);
       }
@@ -371,6 +382,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .error-message {

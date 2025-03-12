@@ -42,7 +42,6 @@
   </div>
 </template>
 
-
 <script>
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
@@ -66,7 +65,6 @@ export default {
         intellectualDevelopment: '',
         socialDevelopment: ''
       },
-     
       physicalError: null,
       emotionalError: null,
       intellectualError: null,
@@ -91,7 +89,6 @@ export default {
   },
 
   methods: {
-    
     validateInput(field) {
       if (!this.formData[field].trim()) {
         this[`${field}Error`] = `${field} is required`;
@@ -102,11 +99,46 @@ export default {
       }
     },
 
+    async saveDevelopment() {
+      
+      const { childId } = this.$route.params;
+      const periodData = {
+        startAge: this.selectedPeriod.start,
+        endAge: this.selectedPeriod.end,
+        physicalDevelopment: this.formData.physicalDevelopment,
+        emotionalDevelopment: this.formData.emotionalDevelopment,
+        intellectualDevelopment: this.formData.intellectualDevelopment,
+        socialDevelopment: this.formData.socialDevelopment
+      };
+
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📤 Saving development data:", periodData);
+        }
+
+        const response = await axios.post(
+          `https://child-development-backend.fly.dev/api/child-development/${childId}`,
+          periodData,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        this.$router.push({ path: '/child-development-list' });
+      } catch (error) {
+        console.error("❌ Error saving development:", error);
+        this.error = "There was an error saving the development data.";
+      }
+    },
+
     async fetchChildData(childId) {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-       
+
         if (process.env.NODE_ENV !== 'production') {
           console.log("🔍 Fetching child data for:", childId);
         }
@@ -207,18 +239,6 @@ export default {
       return filteredMilestones;
     },
 
-    calculateStartDate(months) {
-      const birthDate = new Date(this.childBirthDate);
-      birthDate.setMonth(birthDate.getMonth() + months);
-      return birthDate;
-    },
-
-    calculateEndDate(months) {
-      const birthDate = new Date(this.childBirthDate);
-      birthDate.setMonth(birthDate.getMonth() + months);
-      return birthDate;
-    },
-
     calculateAgeInMonths(birthDate) {
       if (!birthDate) return 0;
       const birth = new Date(birthDate);
@@ -234,96 +254,17 @@ export default {
       }
     },
 
-    async selectPeriod(period) {
-      this.selectedPeriod = period;
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("🔍 Selected Period:", period);
-      }
-
-      await this.fetchMilestones(this.$route.params.childId);
-      this.$forceUpdate();
-    },
-
     formatPeriod(start, end) {
       return `${start}-${end} meseci`;
     },
-
-    formatDate(date) {
-      return new Date(date).toLocaleDateString("sr-RS");
-    },
-
-    getPeriodClass(period) {
-      if (this.isCurrentPeriod(period)) return "period-button current";
-      if (this.isFilledPeriod(period)) return "period-button filled";
-      if (this.isFuturePeriod(period)) return "period-button future";
-      return "period-button past";
-    },
-
-    isCurrentPeriod(period) {
-      return this.childAge >= period.start && this.childAge < period.end;
-    },
-
-    isFilledPeriod(period) {
-      return this.developmentData.some(
-        (d) => d.startAge === period.start && d.endAge === period.end
-      );
-    },
-
-    isFuturePeriod(period) {
-      return this.childAge < period.start;
-    },
-
-    navigateToDevelopmentForm(period) {
-      this.$router.push({
-        path: `/child-development-form/${this.$route.params.childId}`,
-        query: {
-          startAge: period.start,
-          endAge: period.end
-        }
-      });
-    },
-
-    navigateToMilestoneForm() {
-      this.$router.push({
-        path: `/milestone-form/${this.$route.params.childId}`
-      });
-    },
-
-    async confirmDeleteDevelopment(developmentId) {
-      if (window.confirm("Da li ste sigurni da želite da obrišete ove podatke o razvoju?")) {
-        await this.deleteDevelopment(developmentId);
-      }
-    },
-
-    async deleteDevelopment(developmentId) {
-      try {
-        const authStore = useAuthStore();
-        const token = authStore.token;
-        const childId = this.$route.params.childId;
-
-        await axios.delete(`https://child-development-backend.fly.dev/api/child-development/${childId}/${developmentId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        await this.fetchDevelopmentData(childId);
-        await this.fetchMilestones(childId);
-      } catch (error) {
-        console.error("❌ Error deleting development data:", error);
-      }
-    }
   },
 
   async created() {
     try {
       const childId = this.$route.params.childId;
       if (childId) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.log("🚀 Fetching data for child:", childId);
-        }
         await this.fetchChildData(childId);
         await this.fetchDevelopmentData(childId);
-        await this.fetchMilestones(childId);
       }
     } catch (error) {
       console.error("❌ Error in created():", error);
@@ -368,7 +309,7 @@ label {
 
 textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: 160px;  
   padding: 12px;
   border: 1px solid $border-color;
   border-radius: 4px;

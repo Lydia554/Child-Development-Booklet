@@ -47,7 +47,7 @@ export default {
   methods: {
     async fetchDevelopmentData() {
       try {
-        const response = await axios.get(`https://backend-solitary-wave-1128.fly.dev/api/child-development/${this.childId}/${this.startAge}`);
+        const response = await axios.get(`https://child-development-backend.fly.dev/api/child-development/${this.childId}/${this.startAge}`);
         this.developmentData = response.data;
       } catch (error) {
         console.error('Greška pri dobijanju podataka:', error);

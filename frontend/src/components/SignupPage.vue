@@ -114,7 +114,7 @@ export default {
       }
 
       try {
-        const registerResponse = await axios.post('https://backend-solitary-wave-1128.fly.dev/api/users/register', {
+        const registerResponse = await axios.post('https://child-development-backend.fly.dev/api/users/register', {
           name: this.name,
           email: this.email,
           password: this.password,
@@ -126,7 +126,7 @@ export default {
 
         console.log('Registration successful:', registerResponse.data);
 
-        const loginResponse = await axios.post('https://backend-solitary-wave-1128.fly.dev/api/users/login', {
+        const loginResponse = await axios.post('https://child-development-backend.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
         });

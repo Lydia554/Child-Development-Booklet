@@ -84,7 +84,7 @@ export default {
 
       console.log("📢 Fetching child data...");
       const childResponse = await axios.get(
-        `https://backend-solitary-wave-1128.fly.dev/api/${childId}`,
+        `https://child-development-backend.fly.dev/api/${childId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -103,7 +103,7 @@ export default {
 
       console.log("🔍 Fetching existing development data...");
       const response = await axios.get(
-        `https://backend-solitary-wave-1128.fly.dev/api/child-development/${childId}`,
+        `https://child-development-backend.fly.dev/api/child-development/${childId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -169,7 +169,7 @@ export default {
         };
 
         const response = await axios.post(
-          `https://backend-solitary-wave-1128.fly.dev/api/child-development/${childId}`,
+          `https://child-development-backend.fly.dev/api/child-development/${childId}`,
           periodData,
           {
             headers: {

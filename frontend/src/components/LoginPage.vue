@@ -52,7 +52,7 @@ export default {
         authStore.login(token);
 
       
-        const childrenResponse = await axios.get('https://backend-solitary-wave-1128.fly.dev/api', {
+        const childrenResponse = await axios.get('https://child-development-backend.fly.dev/api', {
           headers: { Authorization: `Bearer ${token}` }
         });
 

@@ -37,7 +37,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `https://backend-solitary-wave-1128.fly.dev/api/${childId}`,
+          `https://child-development-backend.fly.dev/api/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.childName = response.data.name;

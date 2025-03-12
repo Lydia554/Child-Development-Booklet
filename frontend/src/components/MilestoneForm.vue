@@ -146,12 +146,12 @@ export default {
 
         if (this.isEditing) {
           await axios.put(
-            `https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.milestoneId}`,
+            `https://child-development-backend.fly.dev/api/milestones/${this.milestoneId}`,
             this.milestone,
             { headers }
           );
         } else {
-          await axios.post(`https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.childId}`, this.milestone, {
+          await axios.post(`https://child-development-backend.fly.dev/api/milestones/${this.childId}`, this.milestone, {
             headers
           });
         }

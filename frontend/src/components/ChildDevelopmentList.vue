@@ -134,7 +134,7 @@ export default {
         const token = authStore.token;
         console.log("🔍 Fetching child data for:", childId);
 
-        const response = await axios.get(`https://backend-solitary-wave-1128.fly.dev/api/${childId}`, {
+        const response = await axios.get(`https://child-development-backend.fly.dev/api/${childId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

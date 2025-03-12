@@ -65,7 +65,12 @@ export default {
         emotionalDevelopment: '',
         intellectualDevelopment: '',
         socialDevelopment: ''
-      }
+      },
+     
+      physicalError: null,
+      emotionalError: null,
+      intellectualError: null,
+      socialError: null
     };
   },
 
@@ -86,11 +91,21 @@ export default {
   },
 
   methods: {
+    
+    validateInput(field) {
+      if (!this.formData[field].trim()) {
+        this[`${field}Error`] = `${field} is required`;
+        this.hasErrors = true;
+      } else {
+        this[`${field}Error`] = null;
+        this.hasErrors = false;
+      }
+    },
+
     async fetchChildData(childId) {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-
        
         if (process.env.NODE_ENV !== 'production') {
           console.log("🔍 Fetching child data for:", childId);
@@ -140,7 +155,6 @@ export default {
         const authStore = useAuthStore();
         const token = authStore.token;
 
-        
         if (process.env.NODE_ENV !== 'production') {
           console.log("📢 Fetching milestones for:", childId);
         }
@@ -173,7 +187,6 @@ export default {
       const endDate = new Date(birthDate);
       endDate.setMonth(endDate.getMonth() + period.end);
 
-     
       if (process.env.NODE_ENV !== 'production') {
         console.log(`🔎 Filtering milestones between ${startDate.toISOString()} - ${endDate.toISOString()}`);
       }
@@ -224,7 +237,6 @@ export default {
     async selectPeriod(period) {
       this.selectedPeriod = period;
 
-      
       if (process.env.NODE_ENV !== 'production') {
         console.log("🔍 Selected Period:", period);
       }
@@ -299,68 +311,6 @@ export default {
       } catch (error) {
         console.error("❌ Error deleting development data:", error);
       }
-    },
-
-    editDevelopment(developmentData) {
-      if (!developmentData) {
-        console.warn("⚠️ No development data available to edit.");
-        return;
-      }
-
-     
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("✏️ Editing development:", developmentData);
-      }
-
-      this.$router.push({
-        path: `/child-development-form/${this.$route.params.childId}`,
-        query: {
-          startAge: developmentData.startAge,
-          endAge: developmentData.endAge
-        }
-      });
-    },
-
-    editMilestone(milestone) {
-      if (!milestone) {
-        console.warn("⚠️ No milestone data available to edit.");
-        return;
-      }
-
-    
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("✏️ Editing milestone:", milestone);
-      }
-
-      this.$router.push({
-        path: `/milestone-form/${this.$route.params.childId}`,
-        query: {
-          milestoneId: milestone._id
-        }
-      });
-    },
-
-    async confirmDeleteMilestone(milestoneId) {
-      if (window.confirm("Da li ste sigurni da želite da obrišete ovaj ključni trenutak?")) {
-        await this.deleteMilestone(milestoneId);
-      }
-    },
-
-    async deleteMilestone(milestoneId) {
-      try {
-        const authStore = useAuthStore();
-        const token = authStore.token;
-        const childId = this.$route.params.childId;
-
-        await axios.delete(`https://child-development-backend.fly.dev/api/milestones/${milestoneId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        await this.fetchMilestones(childId);
-        this.$forceUpdate();
-      } catch (error) {
-        console.error("❌ Error deleting milestone:", error);
-      }
     }
   },
 
@@ -368,7 +318,6 @@ export default {
     try {
       const childId = this.$route.params.childId;
       if (childId) {
-        
         if (process.env.NODE_ENV !== 'production') {
           console.log("🚀 Fetching data for child:", childId);
         }
@@ -383,14 +332,6 @@ export default {
 };
 </script>
 
-
-<style scoped>
-.error-message {
-  color: red;
-  font-size: 14px;
-}
-</style>
-
 <style lang="scss" scoped>
 $primary-color: #4CAF50;
 $primary-disabled: #cccccc;
@@ -401,13 +342,20 @@ $text-color: #333;
 $background-light: #ffffff;
 
 .development-form {
-  max-width: 800px;
+  max-width: 100%; 
+  width: 100%; 
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box; 
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
 }
 
 .form-group {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 label {
@@ -426,6 +374,7 @@ textarea {
   border-radius: 4px;
   font-size: 1rem;
   resize: vertical;
+  box-sizing: border-box;
 }
 
 button {
@@ -437,6 +386,7 @@ button {
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.3s ease;
+  width: 100%; 
 
   &:hover {
     background-color: darken($primary-color, 10%);
@@ -455,12 +405,15 @@ button {
   background-color: $error-bg;
   border-radius: 4px;
   text-align: center;
+  width: 100%; 
+  box-sizing: border-box;
 }
 
 /* 📱 Mobile Styles: Optimized for Phones */
 @media (max-width: 768px) {
   .development-form {
     padding: 15px;
+    width: 100%; 
   }
 
   label {
@@ -475,7 +428,6 @@ button {
   button {
     font-size: 1rem;
     padding: 14px;
-    width: 100%;
   }
 }
 

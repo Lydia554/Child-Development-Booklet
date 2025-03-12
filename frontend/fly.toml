@@ -1,12 +1,8 @@
-# fly.toml app configuration file generated for child-development-frontend on 2025-03-12T12:13:09+01:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'child-development-frontend'
 primary_region = 'fra'
 
 [build]
+  dockerfile = 'Dockerfile' 
 
 [http_service]
   internal_port = 8080

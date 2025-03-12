@@ -11,8 +11,8 @@ RUN npm install --legacy-peer-deps
 # Copy the application source code
 COPY . .
 
-# Expose backend port
+# Expose the backend port
 EXPOSE 5000
 
-# Start the backend server
+# Start the backend server and ensure it listens on 0.0.0.0 (needed for Fly.io)
 CMD ["node", "server.js"]

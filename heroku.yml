@@ -1,12 +1,16 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+
 build:
   docker:
-    web: backend/Dockerfile  
-    frontend: frontend/Dockerfile  
+    web: ./backend/Dockerfile   # Backend Dockerfile
+    frontend: ./frontend/Dockerfile   # Frontend Dockerfile
 
 release:
   command:
-    - echo "Release step running"
+    - echo "Deploying Multi-Container App"
 
 run:
-  web: npm start
-  frontend: serve -s dist -l 8080  
+  web: node server.js
+  frontend: npx serve -s dist -l 8080

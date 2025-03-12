@@ -58,6 +58,7 @@ mongoose.connect(process.env.MONGO_URI, {
     process.exit(1); 
   });
 
-app.listen(port, () => {
-  console.log(`✅ Server je pokrenut na portu ${port}`);
-});
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server is running on port ${port}`);
+  });
+  

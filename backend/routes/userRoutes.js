@@ -6,11 +6,9 @@ const protect = require('../middleware/auth');
 const router = express.Router();
 const childIdCheck = require('../middleware/childIdCheck');  
 
-
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
-
 
 router.post('/register', async (req, res) => {
   try {
@@ -33,13 +31,20 @@ router.post('/register', async (req, res) => {
 
     await user.save();
 
+  
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ User registered successfully:', user);
+    }
+
     res.status(201).json({ message: 'Registracija uspešna! Prijavite se za pristup' });
   } catch (error) {
-    console.error('Greška pri registraciji:', error);
+   
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Greška pri registraciji:', error);
+    }
     res.status(500).json({ message: 'Greška na serveru, pokušajte ponovo' });
   }
 });
-
 
 router.post('/login', async (req, res) => {
   try {
@@ -63,6 +68,11 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(user._id);
 
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔑 User logged in successfully:', user);
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -71,22 +81,32 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Greška pri logovanju:', error);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Greška pri logovanju:', error);
+    }
     res.status(500).json({ message: 'Greška na serveru, pokušajte ponovo' });
   }
 });
 
-
 router.get('/profile', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('📑 User profile fetched:', user);
+    }
+
     res.json({ message: `Dobrodošao, ${user.name}`, user });
   } catch (error) {
-    console.error('Greška pri dohvaćanju korisničkih podataka:', error);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Greška pri dohvaćanju korisničkih podataka:', error);
+    }
     res.status(500).json({ message: 'Greška na serveru' });
   }
 });
-
 
 router.use('/child-development', childIdCheck);  
 

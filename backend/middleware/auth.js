@@ -26,7 +26,10 @@ const protect = async (req, res, next) => {
 
       next(); 
     } catch (error) {
-      console.error('JWT Verification Error:', error.name, error.message);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('JWT Verification Error:', error.name, error.message);
+      }
 
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({ message: 'Session expired, please log in again' });

@@ -11,7 +11,6 @@ const developmentRoutes = require('./routes/developmentRoutes');
 const app = express();
 const port = process.env.PORT || 5000; 
 
-
 const allowedOrigins = [
   'https://child-development-frontend.fly.dev', 
   'http://localhost:8080', 
@@ -46,19 +45,29 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
-console.log("🔄 Povezivanje sa MongoDB...");
+
+if (process.env.NODE_ENV !== 'production') {
+  console.log("🔄 Povezivanje sa MongoDB...");
+}
+
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   dbName: 'ChildTracker' 
 })
-  .then(() => console.log('✅ Uspešno povezivanje sa MongoDB Atlasom'))
+  .then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ Uspešno povezivanje sa MongoDB Atlasom');
+    }
+  })
   .catch(err => {
     console.error('❌ Greška pri povezivanju sa MongoDB:', err);
     process.exit(1); 
   });
 
-  app.listen(port, '0.0.0.0', () => {
+
+app.listen(port, '0.0.0.0', () => {
+  if (process.env.NODE_ENV !== 'production') {
     console.log(`✅ Server is running on port ${port}`);
-  });
-  
+  }
+});

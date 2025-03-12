@@ -3,24 +3,37 @@ const router = express.Router();
 const protect = require('../middleware/auth');
 const ChildDevelopment = require('../models/childDevelopmentModel');
 
-
 router.get('/:childId', protect, async (req, res) => {
   try {
-    console.log('Fetching development for child:', req.params.childId);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Fetching development for child:', req.params.childId);
+    }
+
     const development = await ChildDevelopment.findOne({ childId: req.params.childId });
-    console.log('Found development:', development);
+
+   
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Found development:', development);
+    }
+
     res.json(development ? development.periods : []);
   } catch (error) {
-    console.error('Error fetching development:', error);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error fetching development:', error);
+    }
     res.status(500).json({ message: 'Error fetching development data' });
   }
 });
 
-
 router.post('/:childId', protect, async (req, res) => {
   try {
-    console.log('Saving development for child:', req.params.childId);
-    console.log('Development data:', req.body);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Saving development for child:', req.params.childId);
+      console.log('Development data:', req.body);
+    }
 
     const periodData = {
       startAge: parseInt(req.body.startAge),
@@ -42,47 +55,59 @@ router.post('/:childId', protect, async (req, res) => {
       });
     }
 
-
     const existingPeriodIndex = childDevelopment.periods.findIndex(p => 
       p.startAge === periodData.startAge && p.endAge === periodData.endAge
     );
 
     if (existingPeriodIndex !== -1) {
-     
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Updating existing period');
+      }
+
       childDevelopment.periods[existingPeriodIndex] = periodData;
-      console.log('Updating existing period');
     } else {
-   
+     
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Adding new period');
+      }
+
       childDevelopment.periods.push(periodData);
-      console.log('Adding new period');
     }
 
     const savedDevelopment = await childDevelopment.save();
-    console.log('Saved development:', savedDevelopment);
+
+  
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Saved development:', savedDevelopment);
+    }
 
     res.status(201).json(savedDevelopment);
   } catch (error) {
-    console.error('Error saving development:', error);
+   
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error saving development:', error);
+    }
     res.status(500).json({ message: 'Error saving development data', error: error.message });
   }
 });
 
-
-
 router.delete('/:childId/:developmentId', protect, async (req, res) => {
   try {
     const { childId, developmentId } = req.params;
-    console.log('Deleting development for child:', childId);
-    console.log('Development ID to delete:', developmentId);
+    
 
-  
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Deleting development for child:', childId);
+      console.log('Development ID to delete:', developmentId);
+    }
+
     const childDevelopment = await ChildDevelopment.findOne({ childId: childId });
 
     if (!childDevelopment) {
       return res.status(404).json({ message: 'Development data not found for this child.' });
     }
 
-    
     const periodIndex = childDevelopment.periods.findIndex(p => p._id.toString() === developmentId);
 
     if (periodIndex === -1) {
@@ -94,10 +119,11 @@ router.delete('/:childId/:developmentId', protect, async (req, res) => {
 
     res.status(200).json({ message: 'Development period deleted successfully' });
   } catch (error) {
-    console.error('Error deleting development:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error deleting development:', error);
+    }
     res.status(500).json({ message: 'Error deleting development data' });
   }
 });
-
 
 module.exports = router;

@@ -50,7 +50,7 @@ export default {
     async fetchMilestones() {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5000/api/milestones/${this.childId}`, {
+        const response = await axios.get(`'https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.childId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -74,7 +74,7 @@ export default {
     async deleteMilestone(id) {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.delete(`http://localhost:5000/api/milestones/${id}`, {
+        const response = await axios.delete(`'https://backend-solitary-wave-1128.fly.dev/api/milestones/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         

@@ -99,7 +99,7 @@ export default {
     async fetchChildren() {
       try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/api/", {
+        const response = await axios.get("https://backend-solitary-wave-1128.fly.dev/api/", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -129,7 +129,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/${childId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -150,7 +150,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/child-development/${childId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/child-development/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.developmentData = response.data || [];
@@ -164,7 +164,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/milestones/${childId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.milestoneData = response.data || [];

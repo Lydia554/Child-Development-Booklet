@@ -134,7 +134,7 @@ export default {
         const token = authStore.token;
         console.log("🔍 Fetching child data for:", childId);
 
-        const response = await axios.get(`http://localhost:5000/api/${childId}`, {
+        const response = await axios.get(`https://backend-solitary-wave-1128.fly.dev/api/${childId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -156,7 +156,7 @@ export default {
         console.log("📢 Fetching development data for:", childId);
 
         const response = await axios.get(
-          `http://localhost:5000/api/child-development/${childId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/child-development/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -173,7 +173,7 @@ export default {
         console.log("📢 Fetching milestones for:", childId);
 
         const response = await axios.get(
-          `http://localhost:5000/api/milestones/${childId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -241,10 +241,10 @@ export default {
       this.selectedPeriod = period;
       console.log("🔍 Selected Period:", period);
 
-      // ✅ Ensure milestones are fetched when changing periods
+      
       await this.fetchMilestones(this.$route.params.childId);
 
-      // ✅ Force re-computation of milestones
+     
       this.$forceUpdate();
     },
 

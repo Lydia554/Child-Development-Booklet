@@ -42,7 +42,7 @@ export default {
         const authStore = useAuthStore();
 
         
-        const loginResponse = await axios.post('http://localhost:5000/api/users/login', {
+        const loginResponse = await axios.post('https://backend-solitary-wave-1128.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
         });
@@ -52,7 +52,7 @@ export default {
         authStore.login(token);
 
       
-        const childrenResponse = await axios.get('http://localhost:5000/api', {
+        const childrenResponse = await axios.get('https://backend-solitary-wave-1128.fly.dev/api', {
           headers: { Authorization: `Bearer ${token}` }
         });
 

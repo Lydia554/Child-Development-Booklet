@@ -84,7 +84,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/milestones/${this.milestoneId}`,
+          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.milestoneId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -146,12 +146,12 @@ export default {
 
         if (this.isEditing) {
           await axios.put(
-            `http://localhost:5000/api/milestones/${this.milestoneId}`,
+            `https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.milestoneId}`,
             this.milestone,
             { headers }
           );
         } else {
-          await axios.post(`http://localhost:5000/api/milestones/${this.childId}`, this.milestone, {
+          await axios.post(`https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.childId}`, this.milestone, {
             headers
           });
         }

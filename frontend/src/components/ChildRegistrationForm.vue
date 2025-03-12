@@ -36,7 +36,7 @@ export default {
         const authStore = useAuthStore();
 
         
-        const response = await axios.post('http://localhost:5000/api/', {
+        const response = await axios.post('https://backend-solitary-wave-1128.fly.dev/api/', {
           name: this.name,
           birthDate: this.birthdate // 
         }, {

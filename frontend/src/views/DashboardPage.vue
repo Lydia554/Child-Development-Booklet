@@ -44,7 +44,6 @@ export default {
     const currentChild = ref(null);
     const errorMessage = ref('');
 
-    
     const fetchCurrentChild = async () => {
       try {
         let childId = authStore.childId; 
@@ -59,6 +58,12 @@ export default {
         });
 
         currentChild.value = response.data;
+
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Fetched current child:", response.data);
+        }
+
       } catch (error) {
         console.error("❌ Greška prilikom učitavanja deteta:", error);
         errorMessage.value = "Greška prilikom učitavanja podataka.";
@@ -67,15 +72,16 @@ export default {
       }
     };
 
-   
     onMounted(() => {
       fetchCurrentChild();
     });
 
-  
     watch(() => authStore.childId, async (newChildId) => {
       if (newChildId) {
-        console.log("🔄 Detected child change, refreshing data...");
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("🔄 Detected child change, refreshing data...");
+        }
         await fetchCurrentChild();
       }
     });

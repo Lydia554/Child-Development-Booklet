@@ -114,7 +114,6 @@ export default {
       }
 
       try {
-     
         const registerResponse = await axios.post('https://child-development-backend.fly.dev/api/users/register', {
           name: this.name,
           email: this.email,
@@ -125,25 +124,29 @@ export default {
           }
         });
 
-        console.log('Registracija uspešna:', registerResponse.data);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('Registracija uspešna:', registerResponse.data);
+        }
 
-     
         const loginResponse = await axios.post('https://child-development-backend.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
         });
 
         const token = loginResponse.data.token;
-        sessionStorage.setItem('token', token); 
+        sessionStorage.setItem('token', token);
 
-      
         const authStore = useAuthStore();
         authStore.login(token);
 
         this.$router.push('/child-registration');
         
       } catch (error) {
-        console.error('Greška pri registraciji:', error);
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Greška pri registraciji:', error);
+        }
+
         if (error.response) {
           console.log('Error response data:', error.response.data);
           this.errorMessage = error.response.data.message || 'Došlo je do greške na serveru';

@@ -64,7 +64,10 @@ export default {
     },
 
     selectPeriod(period) {
-      console.log("🔵 Selected Period:", period);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("🔵 Selected Period:", period);
+      }
       this.$emit("period-selected", period);
     },
 
@@ -73,7 +76,10 @@ export default {
     },
 
     getPeriodClass(period) {
-      console.log("🔍 Checking Class for:", period);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("🔍 Checking Class for:", period);
+      }
       if (this.isCurrentPeriod(period)) return "period-button current";
       if (this.isFilledPeriod(period)) return "period-button filled";
       if (this.isFuturePeriod(period)) return "period-button future";
@@ -101,4 +107,3 @@ export default {
   }
 };
 </script>
-

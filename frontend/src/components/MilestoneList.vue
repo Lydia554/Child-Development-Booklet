@@ -1,6 +1,6 @@
 <template>
   <div class="milestone-list-container">
-    <h2>Pregled Kljucnih Momenata</h2>
+    <h2>Pregled Ključnih Momenata</h2>
     <div v-if="milestones.length" class="milestone-list">
       <div v-for="milestone in milestones" :key="milestone._id" class="milestone-item">
         <h3>{{ milestone.milestoneType }} - {{ formatDate(milestone.milestoneDate) }}</h3>
@@ -17,11 +17,11 @@
     </div>
 
     <div v-else class="no-data-message">
-      <p>Nema podataka o Kljucnim Momentima za ovo dete.</p>
+      <p>Nema podataka o Ključnim Momentima za ovo dete.</p>
     </div>
 
     <router-link :to="`/milestone-form/${childId}`" class="add-milestone-button">
-      Dodaj Kljucni Momenat
+      Dodaj Ključni Momenat
     </router-link>
   </div>
 </template>
@@ -55,6 +55,11 @@ export default {
         });
 
         this.milestones = response.data;
+
+      
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Milestones fetched:", response.data);
+        }
       } catch (error) {
         console.error('Error fetching milestones:', error);
       }
@@ -66,7 +71,6 @@ export default {
       return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     },
 
-   
     editMilestone(id) {
       this.$router.push(`/milestone-form/${this.childId}/${id}`);
     },
@@ -78,9 +82,12 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
         
-      
         this.milestones = this.milestones.filter(milestone => milestone._id !== id);
-        console.log('Milestone deleted:', response.data);
+
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('Milestone deleted:', response.data);
+        }
       } catch (error) {
         console.error('Error deleting milestone:', error);
       }
@@ -94,6 +101,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style lang="scss" scoped>

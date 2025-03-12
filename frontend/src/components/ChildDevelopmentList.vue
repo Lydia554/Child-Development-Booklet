@@ -122,7 +122,10 @@ export default {
       if (!this.selectedPeriod) return [];
 
       const milestones = this.getMilestonesForPeriod(this.selectedPeriod);
-      console.log("📢 Current Period Milestones:", milestones);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("📢 Current Period Milestones:", milestones);
+      }
       return milestones;
     },
   },
@@ -132,7 +135,10 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-        console.log("🔍 Fetching child data for:", childId);
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("🔍 Fetching child data for:", childId);
+        }
 
         const response = await axios.get(`https://child-development-backend.fly.dev/api/${childId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -153,7 +159,10 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-        console.log("📢 Fetching development data for:", childId);
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📢 Fetching development data for:", childId);
+        }
 
         const response = await axios.get(
           `https://child-development-backend.fly.dev/api/child-development/${childId}`,
@@ -170,7 +179,10 @@ export default {
       try {
         const authStore = useAuthStore();
         const token = authStore.token;
-        console.log("📢 Fetching milestones for:", childId);
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📢 Fetching milestones for:", childId);
+        }
 
         const response = await axios.get(
           `https://child-development-backend.fly.dev/api/milestones/${childId}`,
@@ -178,7 +190,10 @@ export default {
         );
 
         this.milestoneData = response.data || [];
-        console.log("✅ Fetched Milestones:", this.milestoneData);
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("✅ Fetched Milestones:", this.milestoneData);
+        }
       } catch (error) {
         console.error("❌ Error fetching milestones:", error);
       }
@@ -197,16 +212,25 @@ export default {
       const endDate = new Date(birthDate);
       endDate.setMonth(endDate.getMonth() + period.end);
 
-      console.log(`🔎 Filtering milestones between ${startDate.toISOString()} - ${endDate.toISOString()}`);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔎 Filtering milestones between ${startDate.toISOString()} - ${endDate.toISOString()}`);
+      }
 
       const filteredMilestones = this.milestoneData.filter(milestone => {
         const milestoneDate = new Date(milestone.milestoneDate);
-        console.log(`🔍 Checking Milestone: ${milestone.milestoneType} - ${milestoneDate.toISOString()}`);
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`🔍 Checking Milestone: ${milestone.milestoneType} - ${milestoneDate.toISOString()}`);
+        }
 
         return milestoneDate >= startDate && milestoneDate < endDate;
       });
 
-      console.log("📌 Matched Milestones for Period:", filteredMilestones);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("📌 Matched Milestones for Period:", filteredMilestones);
+      }
       return filteredMilestones;
     },
 
@@ -239,12 +263,12 @@ export default {
 
     async selectPeriod(period) {
       this.selectedPeriod = period;
-      console.log("🔍 Selected Period:", period);
-
-      
-      await this.fetchMilestones(this.$route.params.childId);
-
      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("🔍 Selected Period:", period);
+      }
+
+      await this.fetchMilestones(this.$route.params.childId);
       this.$forceUpdate();
     },
 
@@ -322,7 +346,10 @@ export default {
         return;
       }
 
-      console.log("✏️ Editing development:", developmentData);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("✏️ Editing development:", developmentData);
+      }
 
       this.$router.push({
         path: `/child-development-form/${this.$route.params.childId}`,
@@ -339,7 +366,10 @@ export default {
         return;
       }
 
-      console.log("✏️ Editing milestone:", milestone);
+     
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("✏️ Editing milestone:", milestone);
+      }
 
       this.$router.push({
         path: `/milestone-form/${this.$route.params.childId}`,
@@ -377,7 +407,10 @@ export default {
     try {
       const childId = this.$route.params.childId;
       if (childId) {
-        console.log("🚀 Fetching data for child:", childId);
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("🚀 Fetching data for child:", childId);
+        }
         await this.fetchChildData(childId);
         await this.fetchDevelopmentData(childId);
         await this.fetchMilestones(childId);
@@ -388,6 +421,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style lang="scss" scoped>

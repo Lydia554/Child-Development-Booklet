@@ -64,7 +64,6 @@
 
       <div v-else class="error-message">Nema ključnih momenata za ovo dete.</div>
 
-      <!-- Dugme za preuzimanje PDF-a -->
       <button @click="downloadPDF" class="pdf-button" :disabled="!developmentData.length || !milestoneData.length">Preuzmi PDF</button>
     </div>
   </div>
@@ -104,7 +103,11 @@ export default {
         });
 
         this.children = response.data;
-        console.log("Lista dece učitana:", this.children);
+
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Lista dece učitana:", this.children);
+        }
 
         const authStore = useAuthStore();
         if (authStore.childId) {
@@ -139,7 +142,11 @@ export default {
         }
 
         this.child = response.data;
-        console.log("Podaci o detetu:", this.child);
+
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Podaci o detetu:", this.child);
+        }
       } catch (error) {
         console.error("❌ Greška pri dobijanju podataka o detetu:", error);
         this.errorMessage = "Nije moguće učitati podatke o detetu.";
@@ -154,6 +161,11 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.developmentData = response.data || [];
+
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Razvojni podaci:", this.developmentData);
+        }
       } catch (error) {
         console.error("❌ Greška pri dobijanju podataka o razvoju:", error);
         this.errorMessage = "Nije moguće učitati razvojne podatke.";
@@ -168,13 +180,22 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.milestoneData = response.data || [];
+
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Podaci o ključnim momentima:", this.milestoneData);
+        }
       } catch (error) {
         console.error("❌ Greška pri dobijanju ključnih momenata:", error);
       }
     },
 
     async onChildSelect() {
-      console.log("Odabrano dete ID:", this.selectedChildId);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("Odabrano dete ID:", this.selectedChildId);
+      }
+
       const authStore = useAuthStore();
       authStore.setCurrentChildId(this.selectedChildId);
       await this.fetchChildData(this.selectedChildId);

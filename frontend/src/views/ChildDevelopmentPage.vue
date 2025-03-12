@@ -21,7 +21,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import axios from 'axios';
 
@@ -49,6 +48,11 @@ export default {
       try {
         const response = await axios.get(`https://child-development-backend.fly.dev/api/child-development/${this.childId}/${this.startAge}`);
         this.developmentData = response.data;
+
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Fetched development data:", response.data);
+        }
       } catch (error) {
         console.error('Greška pri dobijanju podataka:', error);
       }

@@ -94,6 +94,12 @@ export default {
             milestoneDate: new Date(response.data.milestoneDate).toISOString().split("T")[0]
           };
         }
+
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Fetched milestone data:", this.milestone);
+        }
+
       } catch (error) {
         console.error("Error fetching milestone:", error);
       }
@@ -101,7 +107,7 @@ export default {
   },
 
   methods: {
-    
+
     validateMilestoneType() {
       if (!this.milestone.milestoneType.trim()) {
         this.milestoneTypeError = "Tip momenta je obavezan.";
@@ -129,9 +135,8 @@ export default {
       }
     },
 
-  
     async submitForm() {
-    
+
       this.validateMilestoneType();
       this.validateMilestoneDate();
       this.validateProgress();
@@ -150,10 +155,18 @@ export default {
             this.milestone,
             { headers }
           );
+          
+          if (process.env.NODE_ENV !== 'production') {
+            console.log("Updated milestone:", this.milestone);
+          }
         } else {
           await axios.post(`https://child-development-backend.fly.dev/api/milestones/${this.childId}`, this.milestone, {
             headers
           });
+          
+          if (process.env.NODE_ENV !== 'production') {
+            console.log("Created new milestone:", this.milestone);
+          }
         }
 
         this.$router.push(`/child-development-list/${this.childId}`);

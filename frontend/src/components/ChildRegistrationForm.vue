@@ -19,51 +19,141 @@
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axios from "axios";
 
 export default {
+  props: ["childId", "milestoneId"],
+
   data() {
     return {
-      name: '',
-      birthdate: '', 
-      errorMessage: '',
+      milestone: {
+        milestoneType: "",
+        milestoneDate: "",
+        progress: "",
+        notes: "",
+        startAge: this.$route.query.startAge || 0,
+        endAge: this.$route.query.endAge || 0,
+        childId: this.childId
+      },
+      isEditing: false,
+      milestoneTypeError: null,
+      milestoneDateError: null,
+      progressError: null,
+      hasErrors: false
     };
   },
-  methods: {
-    async registerChild() {
+
+  async created() {
+    if (this.milestoneId) {
+      this.isEditing = true;
       try {
-        const authStore = useAuthStore();
+        const token = sessionStorage.getItem("token");
+        const response = await axios.get(
+          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.milestoneId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        
-        const response = await axios.post('https://child-development-backend.fly.dev/api/', {
-          name: this.name,
-          birthDate: this.birthdate 
-        }, {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
-        });
+        if (response.data) {
+          this.milestone = {
+            ...response.data,
+            milestoneDate: new Date(response.data.milestoneDate).toISOString().split("T")[0]
+          };
+        }
 
-        if (response.data && response.data._id) {
-          console.log("✅ Dete registrovano:", response.data);
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Fetched milestone data:", this.milestone);
+        }
+
+      } catch (error) {
+        console.error("Error fetching milestone:", error);
+      }
+    }
+  },
+
+  methods: {
+
+    validateMilestoneType() {
+      if (!this.milestone.milestoneType.trim()) {
+        this.milestoneTypeError = "Tip momenta je obavezan.";
+        this.hasErrors = true;
+      } else {
+        this.milestoneTypeError = null;
+      }
+    },
+
+    validateMilestoneDate() {
+      if (!this.milestone.milestoneDate) {
+        this.milestoneDateError = "Datum je obavezan.";
+        this.hasErrors = true;
+      } else {
+        this.milestoneDateError = null;
+      }
+    },
+
+    validateProgress() {
+      if (!this.milestone.progress.trim()) {
+        this.progressError = "Napredak je obavezan.";
+        this.hasErrors = true;
+      } else {
+        this.progressError = null;
+      }
+    },
+
+    async submitForm() {
+
+      this.validateMilestoneType();
+      this.validateMilestoneDate();
+      this.validateProgress();
+
+      if (this.hasErrors) {
+        return; 
+      }
+
+      try {
+        const token = sessionStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
+
+        if (this.isEditing) {
+          await axios.put(
+            `https://child-development-backend.fly.dev/api/milestones/${this.milestoneId}`,
+            this.milestone,
+            { headers }
+          );
           
          
-          authStore.addChildId(response.data._id);
-          authStore.setCurrentChildId(response.data._id);
-          sessionStorage.setItem('childId', response.data._id);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log("Updated milestone:", this.milestone);
+          }
 
-         
-          this.$router.push('/dashboard');
         } else {
-          this.errorMessage = "Greška prilikom registracije deteta.";
+          await axios.post(`https://child-development-backend.fly.dev/api/milestones/${this.childId}`, this.milestone, {
+            headers
+          });
+
+          
+          if (process.env.NODE_ENV !== 'production') {
+            console.log("Created new milestone:", this.milestone);
+          }
         }
+
+        this.$router.push(`/child-development-list/${this.childId}`);
       } catch (error) {
-        console.error("❌ Greška pri registraciji deteta:", error);
-        this.errorMessage = "Neuspešna registracija. Pokušajte ponovo.";
+        console.error("Error saving milestone:", error);
       }
+    },
+
+    formatPeriod(start, end) {
+      return `${start}-${end} meseci`;
+    },
+
+    goBack() {
+      this.$router.push(`/child-development-list/${this.childId}`);
     }
   }
 };
 </script>
+
 
 
 

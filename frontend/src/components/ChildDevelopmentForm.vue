@@ -41,155 +41,334 @@
 </template>
 
 <script>
-import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   data() {
     return {
-      formData: {
-        physicalDevelopment: "",
-        emotionalDevelopment: "",
-        intellectualDevelopment: "",
-        socialDevelopment: "",
-      },
-      currentPeriod: {
-        startAge: null,
-        endAge: null,
-      },
+      childName: null,
+      childAge: null,
+      developmentData: [],
+      milestoneData: [],
+      availablePeriods: [],
+      selectedPeriod: null,
       childBirthDate: null,
-      childAgeInMonths: null,
-      error: null,
-      loading: false,
-
-      physicalError: null,
-      emotionalError: null,
-      intellectualError: null,
-      socialError: null,
-
-      hasErrors: false,
     };
   },
 
-  async created() {
-    console.log("🔄 Component Created: Fetching child and period data...");
-    await this.initializeForm();
+  computed: {
+    currentPeriodDevelopment() {
+      return this.selectedPeriod
+        ? this.developmentData.find(
+            (d) =>
+              d.startAge === this.selectedPeriod.start &&
+              d.endAge === this.selectedPeriod.end
+          )
+        : null;
+    },
+
+    currentPeriodMilestones() {
+      if (!this.selectedPeriod) return [];
+
+      const milestones = this.getMilestonesForPeriod(this.selectedPeriod);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("📢 Current Period Milestones:", milestones);
+      }
+      return milestones;
+    },
   },
 
   methods: {
-    async initializeForm() {
-      const authStore = useAuthStore();
-      const token = authStore.token;
-      const childId = authStore.childId;
-
-      console.log("📢 Fetching child data...");
-      const childResponse = await axios.get(
-        `https://child-development-backend.fly.dev/api/${childId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (childResponse.data) {
-        this.childBirthDate = childResponse.data.birthDate;
-        this.childAgeInMonths = this.calculateAgeInMonths(this.childBirthDate);
-
-        
-        const { startAge, endAge } = this.$route.query;
-        if (startAge && endAge) {
-          this.currentPeriod = { startAge: parseInt(startAge), endAge: parseInt(endAge) };
-        } else {
-          this.setCurrentPeriod(this.childAgeInMonths);
+    async fetchChildData(childId) {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("🔍 Fetching child data for:", childId);
         }
-      }
 
-      console.log("🔍 Fetching existing development data...");
-      const response = await axios.get(
-        `https://child-development-backend.fly.dev/api/child-development/${childId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+        const response = await axios.get(`https://child-development-backend.fly.dev/api/${childId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      if (response.data.length > 0) {
-        const existingPeriod = response.data.find(
-          (p) => p.startAge === this.currentPeriod.startAge && p.endAge === this.currentPeriod.endAge
-        );
-
-        if (existingPeriod) {
-          console.log("✅ Found existing data for period:", existingPeriod);
-          this.formData = { ...existingPeriod };
+        if (response.data) {
+          this.childName = response.data.name;
+          this.childAge = this.calculateAgeInMonths(response.data.birthDate);
+          this.childBirthDate = response.data.birthDate;
+          this.generateAvailablePeriods();
         }
+      } catch (error) {
+        console.error("❌ Error fetching child data:", error);
       }
     },
 
+    async fetchDevelopmentData(childId) {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📢 Fetching development data for:", childId);
+        }
+
+        const response = await axios.get(
+          `https://child-development-backend.fly.dev/api/child-development/${childId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        this.developmentData = response.data || [];
+      } catch (error) {
+        console.error("❌ Error fetching development data:", error);
+      }
+    },
+
+    async fetchMilestones(childId) {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+       
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("📢 Fetching milestones for:", childId);
+        }
+
+        const response = await axios.get(
+          `https://child-development-backend.fly.dev/api/milestones/${childId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        this.milestoneData = response.data || [];
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("✅ Fetched Milestones:", this.milestoneData);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching milestones:", error);
+      }
+    },
+
+    getMilestonesForPeriod(period) {
+      if (!this.childBirthDate) {
+        console.warn("⚠️ Child birth date is missing, cannot filter milestones.");
+        return [];
+      }
+
+      const birthDate = new Date(this.childBirthDate);
+      const startDate = new Date(birthDate);
+      startDate.setMonth(startDate.getMonth() + period.start);
+
+      const endDate = new Date(birthDate);
+      endDate.setMonth(endDate.getMonth() + period.end);
+
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔎 Filtering milestones between ${startDate.toISOString()} - ${endDate.toISOString()}`);
+      }
+
+      const filteredMilestones = this.milestoneData.filter(milestone => {
+        const milestoneDate = new Date(milestone.milestoneDate);
+      
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`🔍 Checking Milestone: ${milestone.milestoneType} - ${milestoneDate.toISOString()}`);
+        }
+
+        return milestoneDate >= startDate && milestoneDate < endDate;
+      });
+
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("📌 Matched Milestones for Period:", filteredMilestones);
+      }
+      return filteredMilestones;
+    },
+
+    calculateStartDate(months) {
+      const birthDate = new Date(this.childBirthDate);
+      birthDate.setMonth(birthDate.getMonth() + months);
+      return birthDate;
+    },
+
+    calculateEndDate(months) {
+      const birthDate = new Date(this.childBirthDate);
+      birthDate.setMonth(birthDate.getMonth() + months);
+      return birthDate;
+    },
+
     calculateAgeInMonths(birthDate) {
+      if (!birthDate) return 0;
       const birth = new Date(birthDate);
       const now = new Date();
       return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
     },
 
-    setCurrentPeriod(ageInMonths) {
-      const periodLength = 6; 
-      const startAge = Math.floor(ageInMonths / periodLength) * periodLength;
-      const endAge = startAge + periodLength;
-
-      this.currentPeriod = { startAge, endAge };
-    },
-
-    validateInput(field) {
-      this.hasErrors = false;
-      const inputValue = this.formData[field].trim().length;
-
-      if (inputValue < 5) {
-        this[`${field}Error`] = `Polje ${field} mora imati najmanje 5 karaktera.`;
-        this.hasErrors = true;
-      } else {
-        this[`${field}Error`] = null;
+    generateAvailablePeriods() {
+      if (this.childAge === null) return;
+      this.availablePeriods = [];
+      for (let i = 0; i <= 72; i += 6) {
+        this.availablePeriods.push({ start: i, end: i + 6 });
       }
     },
 
-    async saveDevelopment() {
-      if (this.hasErrors) {
-        this.error = "Molimo ispravite greške pre nego što pošaljete podatke.";
+    async selectPeriod(period) {
+      this.selectedPeriod = period;
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("🔍 Selected Period:", period);
+      }
+
+      await this.fetchMilestones(this.$route.params.childId);
+      this.$forceUpdate();
+    },
+
+    formatPeriod(start, end) {
+      return `${start}-${end} meseci`;
+    },
+
+    formatDate(date) {
+      return new Date(date).toLocaleDateString("sr-RS");
+    },
+
+    getPeriodClass(period) {
+      if (this.isCurrentPeriod(period)) return "period-button current";
+      if (this.isFilledPeriod(period)) return "period-button filled";
+      if (this.isFuturePeriod(period)) return "period-button future";
+      return "period-button past";
+    },
+
+    isCurrentPeriod(period) {
+      return this.childAge >= period.start && this.childAge < period.end;
+    },
+
+    isFilledPeriod(period) {
+      return this.developmentData.some(
+        (d) => d.startAge === period.start && d.endAge === period.end
+      );
+    },
+
+    isFuturePeriod(period) {
+      return this.childAge < period.start;
+    },
+
+    navigateToDevelopmentForm(period) {
+      this.$router.push({
+        path: `/child-development-form/${this.$route.params.childId}`,
+        query: {
+          startAge: period.start,
+          endAge: period.end
+        }
+      });
+    },
+
+    navigateToMilestoneForm() {
+      this.$router.push({
+        path: `/milestone-form/${this.$route.params.childId}`
+      });
+    },
+
+    async confirmDeleteDevelopment(developmentId) {
+      if (window.confirm("Da li ste sigurni da želite da obrišete ove podatke o razvoju?")) {
+        await this.deleteDevelopment(developmentId);
+      }
+    },
+
+    async deleteDevelopment(developmentId) {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+        const childId = this.$route.params.childId;
+
+        await axios.delete(`https://child-development-backend.fly.dev/api/child-development/${childId}/${developmentId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        await this.fetchDevelopmentData(childId);
+        await this.fetchMilestones(childId);
+      } catch (error) {
+        console.error("❌ Error deleting development data:", error);
+      }
+    },
+
+    editDevelopment(developmentData) {
+      if (!developmentData) {
+        console.warn("⚠️ No development data available to edit.");
         return;
       }
 
-      try {
-        this.loading = true;
-        const authStore = useAuthStore();
-        const childId = authStore.childId;
-        const token = authStore.token;
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("✏️ Editing development:", developmentData);
+      }
 
-        console.log("📤 Sending development data:", this.formData);
+      this.$router.push({
+        path: `/child-development-form/${this.$route.params.childId}`,
+        query: {
+          startAge: developmentData.startAge,
+          endAge: developmentData.endAge
+        }
+      });
+    },
 
-        const periodData = {
-          startAge: this.currentPeriod.startAge,
-          endAge: this.currentPeriod.endAge,
-          physicalDevelopment: this.formData.physicalDevelopment,
-          emotionalDevelopment: this.formData.emotionalDevelopment,
-          intellectualDevelopment: this.formData.intellectualDevelopment,
-          socialDevelopment: this.formData.socialDevelopment,
-        };
+    editMilestone(milestone) {
+      if (!milestone) {
+        console.warn("⚠️ No milestone data available to edit.");
+        return;
+      }
 
-        const response = await axios.post(
-          `https://child-development-backend.fly.dev/api/child-development/${childId}`,
-          periodData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("✏️ Editing milestone:", milestone);
+      }
 
-        console.log("✅ Development data saved:", response.data);
+      this.$router.push({
+        path: `/milestone-form/${this.$route.params.childId}`,
+        query: {
+          milestoneId: milestone._id
+        }
+      });
+    },
 
-        this.$router.push(`/child-development-list/${childId}`);
-      } catch (error) {
-        console.error("❌ Error saving development:", error);
-        this.error = "Greška pri čuvanju podataka.";
-      } finally {
-        this.loading = false;
+    async confirmDeleteMilestone(milestoneId) {
+      if (window.confirm("Da li ste sigurni da želite da obrišete ovaj ključni trenutak?")) {
+        await this.deleteMilestone(milestoneId);
       }
     },
+
+    async deleteMilestone(milestoneId) {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.token;
+        const childId = this.$route.params.childId;
+
+        await axios.delete(`https://child-development-backend.fly.dev/api/milestones/${milestoneId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        await this.fetchMilestones(childId);
+        this.$forceUpdate();
+      } catch (error) {
+        console.error("❌ Error deleting milestone:", error);
+      }
+    }
   },
+
+  async created() {
+    try {
+      const childId = this.$route.params.childId;
+      if (childId) {
+        
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("🚀 Fetching data for child:", childId);
+        }
+        await this.fetchChildData(childId);
+        await this.fetchDevelopmentData(childId);
+        await this.fetchMilestones(childId);
+      }
+    } catch (error) {
+      console.error("❌ Error in created():", error);
+    }
+  }
 };
 </script>
 

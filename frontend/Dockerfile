@@ -5,7 +5,7 @@ FROM node:18 AS build
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json ./ 
 
 # Install dependencies
 RUN npm install --legacy-peer-deps
@@ -14,8 +14,8 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-# Use a lightweight static file server to serve the built files
+# Expose the port where the app will be served
 EXPOSE 8080
 
 # Serve the built files and ensure it listens on 0.0.0.0:8080
-CMD ["npx", "serve", "-s", "dist", "-l", "0.0.0.0:8080"]
+CMD ["npx", "serve", "-s", "dist", "-l", "8080"]

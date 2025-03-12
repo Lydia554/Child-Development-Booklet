@@ -1,7 +1,8 @@
 import axios from "axios";
 
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://child-development-backend.fly.dev/api";
+
 
 
 const api = axios.create({
@@ -10,7 +11,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 
 export const loginUser = async (email, password) => {
   try {
@@ -22,7 +22,6 @@ export const loginUser = async (email, password) => {
   }
 };
 
-
 export const addChildData = async (childData) => {
   try {
     const response = await api.post("/children", childData);
@@ -33,7 +32,6 @@ export const addChildData = async (childData) => {
   }
 };
 
-
 export const getChildren = async () => {
   try {
     const response = await api.get("/children");
@@ -43,3 +41,5 @@ export const getChildren = async () => {
     throw error;
   }
 };
+
+export default api;

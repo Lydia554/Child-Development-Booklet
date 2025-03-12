@@ -38,7 +38,7 @@ export default {
         
         const response = await axios.post('https://child-development-backend.fly.dev/api/', {
           name: this.name,
-          birthDate: this.birthdate // 
+          birthDate: this.birthdate 
         }, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         });

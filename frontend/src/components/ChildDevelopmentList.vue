@@ -156,7 +156,7 @@ export default {
         console.log("📢 Fetching development data for:", childId);
 
         const response = await axios.get(
-          `https://backend-solitary-wave-1128.fly.dev/api/child-development/${childId}`,
+          `https://child-development-backend.fly.dev/api/child-development/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -173,7 +173,7 @@ export default {
         console.log("📢 Fetching milestones for:", childId);
 
         const response = await axios.get(
-          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${childId}`,
+          `https://child-development-backend.fly.dev/api/milestones/${childId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -305,7 +305,7 @@ export default {
         const token = authStore.token;
         const childId = this.$route.params.childId;
 
-        await axios.delete(`http://localhost:5000/api/child-development/${childId}/${developmentId}`, {
+        await axios.delete(`https://child-development-backend.fly.dev/api/child-development/${childId}/${developmentId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -361,7 +361,7 @@ export default {
         const token = authStore.token;
         const childId = this.$route.params.childId;
 
-        await axios.delete(`http://localhost:5000/api/milestones/${milestoneId}`, {
+        await axios.delete(`https://child-development-backend.fly.dev/api/milestones/${milestoneId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

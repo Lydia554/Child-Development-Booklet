@@ -42,7 +42,7 @@ export default {
         const authStore = useAuthStore();
 
         
-        const loginResponse = await axios.post('https://backend-solitary-wave-1128.fly.dev/api/users/login', {
+        const loginResponse = await axios.post('https://child-development-backend.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
         });

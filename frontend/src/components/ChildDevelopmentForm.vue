@@ -176,7 +176,6 @@ export default {
           console.log("📊 Development data:", this.developmentData);
         }
 
-        // Set the selected period based on the child's age
         this.selectedPeriod = this.availablePeriods.find(period => 
           this.childAge >= period.start && this.childAge < period.end
         );
@@ -275,6 +274,7 @@ export default {
   }
 };
 </script>
+
 
 <style lang="scss" scoped>
 $primary-color: #4CAF50;

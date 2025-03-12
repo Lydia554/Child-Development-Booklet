@@ -175,6 +175,11 @@ export default {
         if (process.env.NODE_ENV !== 'production') {
           console.log("📊 Development data:", this.developmentData);
         }
+
+        // Set the selected period based on the child's age
+        this.selectedPeriod = this.availablePeriods.find(period => 
+          this.childAge >= period.start && this.childAge < period.end
+        );
       } catch (error) {
         console.error("❌ Error fetching development data:", error);
       }
@@ -281,7 +286,7 @@ $text-color: #333;
 $background-light: #ffffff;
 
 .development-form {
-  max-width: 100%;
+  max-width: 800px;
   width: 100%;
   margin: 0 auto;
   padding: 20px;
@@ -302,16 +307,16 @@ label {
   margin-bottom: 5px;
   font-weight: bold;
   color: $text-color;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 textarea {
   width: 100%;
-  min-height: 200px;
-  padding: 15px;
+  min-height: 250px;
+  padding: 20px;
   border: 1px solid $border-color;
   border-radius: 4px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   resize: vertical;
   box-sizing: border-box;
 }
@@ -323,7 +328,7 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   transition: background-color 0.3s ease;
   width: 100%;
 
@@ -356,16 +361,16 @@ button {
   }
 
   label {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 
   textarea {
-    font-size: 1rem;
-    padding: 12px;
+    font-size: 1.2rem;
+    padding: 15px;
   }
 
   button {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     padding: 14px;
   }
 }
@@ -377,12 +382,12 @@ button {
   }
 
   label {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   textarea {
-    font-size: 0.95rem;
-    padding: 10px;
+    font-size: 1rem;
+    padding: 12px;
   }
 
   button {
@@ -398,12 +403,12 @@ button {
   }
 
   label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   textarea {
-    font-size: 0.85rem;
-    padding: 8px;
+    font-size: 0.9rem;
+    padding: 10px;
   }
 
   button {

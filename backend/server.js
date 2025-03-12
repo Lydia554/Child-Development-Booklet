@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -19,30 +19,27 @@ app.use('/api/milestones', milestoneRoutes);
 app.use('/api', childRoutes); 
 app.use('/api/child-development', developmentRoutes);  
 
-
 app.get("/", (req, res) => {
-  res.send("✅ Backend is running on Fly.io!");
+  res.send("✅ Backend radi na Fly.io!");
 });
 
-
 if (!process.env.MONGO_URI) {
-  console.error("❌ MONGO_URI is not defined in environment variables!");
+  console.error("❌ MONGO_URI nije definisan u promenljivama okruženja!");
   process.exit(1);
 }
 
-
-console.log("🔄 Connecting to MongoDB...");
+console.log("🔄 Povezivanje sa MongoDB bazom...");
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   dbName: 'ChildTracker' 
 })
-  .then(() => console.log('✅ Successfully connected to MongoDB Atlas'))
+  .then(() => console.log('✅ Uspešno povezivanje sa MongoDB Atlasom'))
   .catch(err => {
-    console.error('❌ MongoDB Connection Error:', err);
+    console.error('❌ Greška pri povezivanju sa MongoDB:', err);
     process.exit(1); 
   });
 
 app.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+  console.log(`✅ Server je pokrenut na portu ${port}`);
 });

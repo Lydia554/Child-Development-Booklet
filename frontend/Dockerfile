@@ -14,6 +14,8 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-# Use a lightweight server to serve the built files
+# Use a lightweight static file server to serve the built files
 EXPOSE 8080
-CMD ["npx", "serve", "-s", "dist", "-l", "8080"]
+
+# Serve the built files and ensure it listens on 0.0.0.0:8080
+CMD ["npx", "serve", "-s", "dist", "-l", "0.0.0.0:8080"]

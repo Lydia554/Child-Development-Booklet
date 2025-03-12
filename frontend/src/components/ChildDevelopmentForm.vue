@@ -2,7 +2,6 @@
   <div class="development-form">
     <h2>Unos Razvoja Deteta</h2>
 
-    <!-- Ensure currentPeriod is defined before accessing its properties -->
     <h3 v-if="currentPeriod">Trenutni period: {{ currentPeriod.startAge }} - {{ currentPeriod.endAge }} meseci</h3>
     <h3 v-if="childAgeInMonths">Trenutna starost deteta: {{ childAgeInMonths }} meseci</h3>
 
@@ -100,7 +99,6 @@ export default {
     },
 
     async saveDevelopment() {
-      
       const { childId } = this.$route.params;
       const periodData = {
         startAge: this.selectedPeriod.start,
@@ -119,7 +117,8 @@ export default {
           console.log("📤 Saving development data:", periodData);
         }
 
-        const response = await axios.post(
+       
+        await axios.post(
           `https://child-development-backend.fly.dev/api/child-development/${childId}`,
           periodData,
           {
@@ -127,6 +126,7 @@ export default {
           }
         );
 
+        
         this.$router.push({ path: '/child-development-list' });
       } catch (error) {
         console.error("❌ Error saving development:", error);

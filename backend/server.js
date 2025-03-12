@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Uvoz CORS-a
+const cors = require('cors'); 
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes'); 
 const milestoneRoutes = require('./routes/milestoneRoutes');
@@ -11,10 +11,10 @@ const developmentRoutes = require('./routes/developmentRoutes');
 const app = express();
 const port = process.env.PORT || 5000; 
 
-// CORS konfiguracija
+
 const allowedOrigins = [
-  'https://child-development-frontend.fly.dev', // Dozvolite vaš frontend domen
-  'http://localhost:8080', // Dozvolite vaš lokalni razvojni domen ako je potrebno
+  'https://child-development-frontend.fly.dev', 
+  'http://localhost:8080', 
 ];
 
 const corsOptions = {
@@ -25,10 +25,9 @@ const corsOptions = {
       callback(new Error('Nije dozvoljeno od strane CORS-a'));
     }
   },
-  credentials: true, // Dozvolite kolačiće ili autorizacione zaglavlja
+  credentials: true, 
 };
 
-// Primena CORS middleware sa specifičnim opcijama
 app.use(cors(corsOptions)); 
 app.use(bodyParser.json()); 
 app.use(express.json()); 

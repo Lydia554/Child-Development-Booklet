@@ -2,7 +2,7 @@ app = "child-development-booklet"
 primary_region = "fra"
 
 [build]
-  dockerfile = "Dockerfile"  # Instead of "backend/Dockerfile"
+  dockerfile = "Dockerfile" 
 
 [http_service]
   internal_port = 5000

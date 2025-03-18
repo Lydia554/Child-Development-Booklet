@@ -7,9 +7,24 @@
     </div>
 
     <form @submit.prevent="registerChild">
-      <input type="text" v-model="name" placeholder="Ime deteta" required />
-      <input type="date" v-model="birthdate" required />
-      <button type="submit">Registruj Dete</button>
+      <input
+        type="text"
+        v-model="name"
+        placeholder="Ime deteta"
+        required
+        @blur="validateName"
+      />
+      <div v-if="nameError" class="error-message">{{ nameError }}</div>
+
+      <input
+        type="date"
+        v-model="birthdate"
+        required
+        @blur="validateBirthdate"
+      />
+      <div v-if="birthdateError" class="error-message">{{ birthdateError }}</div>
+
+      <button type="submit" :disabled="hasErrors">Registruj Dete</button>
     </form>
 
     <div class="dashboard-link">
@@ -22,139 +37,77 @@
 import axios from "axios";
 
 export default {
-  props: ["childId", "milestoneId"],
-
   data() {
     return {
-      milestone: {
-        milestoneType: "",
-        milestoneDate: "",
-        progress: "",
-        notes: "",
-        startAge: this.$route.query.startAge || 0,
-        endAge: this.$route.query.endAge || 0,
-        childId: this.childId
-      },
-      isEditing: false,
-      milestoneTypeError: null,
-      milestoneDateError: null,
-      progressError: null,
+      name: '',
+      birthdate: '',
+      developmentStage: '', // Optional field
+      errorMessage: '',
+      nameError: null,
+      birthdateError: null,
       hasErrors: false
     };
   },
 
-  async created() {
-    if (this.milestoneId) {
-      this.isEditing = true;
+  methods: {
+    validateName() {
+      if (!this.name.trim()) {
+        this.nameError = "Ime deteta je obavezno.";
+        this.hasErrors = true;
+      } else {
+        this.nameError = null;
+      }
+    },
+
+    validateBirthdate() {
+      if (!this.birthdate) {
+        this.birthdateError = "Datum rođenja deteta je obavezan.";
+        this.hasErrors = true;
+      } else {
+        this.birthdateError = null;
+      }
+    },
+
+    async registerChild() {
+      this.hasErrors = false; 
+      this.validateName();
+      this.validateBirthdate();
+
+      if (this.hasErrors) {
+        return;
+      }
+
       try {
-        const token = sessionStorage.getItem("token");
-        const response = await axios.get(
-          `https://child-development-backend.fly.dev/api/milestones/${this.milestoneId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        const response = await axios.post(
+          'https://child-development-backend.fly.dev/api/',
+          {
+            name: this.name,
+            birthDate: this.birthdate, 
+            developmentStage: this.developmentStage || 'Not specified' 
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            }
+          }
         );
 
         if (response.data) {
-          this.milestone = {
-            ...response.data,
-            milestoneDate: new Date(response.data.milestoneDate).toISOString().split("T")[0]
-          };
+          console.log('Child registered successfully:', response.data);
+          this.$router.push('/dashboard'); 
         }
-
-       
-        if (process.env.NODE_ENV !== 'production') {
-          console.log("Fetched milestone data:", this.milestone);
-        }
-
       } catch (error) {
-        console.error("Error fetching milestone:", error);
-      }
-    }
-  },
-
-  methods: {
-
-    validateMilestoneType() {
-      if (!this.milestone.milestoneType.trim()) {
-        this.milestoneTypeError = "Tip momenta je obavezan.";
-        this.hasErrors = true;
-      } else {
-        this.milestoneTypeError = null;
-      }
-    },
-
-    validateMilestoneDate() {
-      if (!this.milestone.milestoneDate) {
-        this.milestoneDateError = "Datum je obavezan.";
-        this.hasErrors = true;
-      } else {
-        this.milestoneDateError = null;
-      }
-    },
-
-    validateProgress() {
-      if (!this.milestone.progress.trim()) {
-        this.progressError = "Napredak je obavezan.";
-        this.hasErrors = true;
-      } else {
-        this.progressError = null;
-      }
-    },
-
-    async submitForm() {
-
-      this.validateMilestoneType();
-      this.validateMilestoneDate();
-      this.validateProgress();
-
-      if (this.hasErrors) {
-        return; 
-      }
-
-      try {
-        const token = sessionStorage.getItem("token");
-        const headers = { Authorization: `Bearer ${token}` };
-
-        if (this.isEditing) {
-          await axios.put(
-            `https://child-development-backend.fly.dev/api/milestones/${this.milestoneId}`,
-            this.milestone,
-            { headers }
-          );
-          
-         
-          if (process.env.NODE_ENV !== 'production') {
-            console.log("Updated milestone:", this.milestone);
-          }
-
+        console.error('Error during child registration:', error);
+        if (error.response) {
+          this.errorMessage = error.response.data.message || 'Došlo je do greške pri registraciji deteta';
         } else {
-          await axios.post(`https://child-development-backend.fly.dev/api/milestones/${this.childId}`, this.milestone, {
-            headers
-          });
-
-          
-          if (process.env.NODE_ENV !== 'production') {
-            console.log("Created new milestone:", this.milestone);
-          }
+          this.errorMessage = 'Došlo je do greške pri povezivanju sa serverom';
         }
-
-        this.$router.push(`/child-development-list/${this.childId}`);
-      } catch (error) {
-        console.error("Error saving milestone:", error);
       }
-    },
-
-    formatPeriod(start, end) {
-      return `${start}-${end} meseci`;
-    },
-
-    goBack() {
-      this.$router.push(`/child-development-list/${this.childId}`);
     }
   }
 };
 </script>
-
-
 
 
 <style lang="scss" scoped>

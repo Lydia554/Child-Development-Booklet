@@ -1,4 +1,4 @@
-app = "child-development-booklet"
+app = "temeljna-knjizica"
 primary_region = "fra"
 
 [build]

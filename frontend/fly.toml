@@ -1,8 +1,13 @@
-app = 'child-development-frontend'
+# fly.toml app configuration file generated for temeljna-knjizica on 2025-03-18T11:12:09+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'temeljna-knjizica'
 primary_region = 'fra'
 
 [build]
-  dockerfile = 'Dockerfile' 
+  dockerfile = 'Dockerfile'
 
 [http_service]
   internal_port = 8080

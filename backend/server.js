@@ -12,7 +12,7 @@ const app = express();
 const port = process.env.PORT || 5000; 
 
 const allowedOrigins = [
-  'https://child-development-frontend.fly.dev', 
+  'https://temeljna-knjizica.fly.dev', 
   'http://localhost:8080', 
 ];
 

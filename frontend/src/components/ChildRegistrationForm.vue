@@ -49,7 +49,7 @@ export default {
       try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(
-          `https://backend-solitary-wave-1128.fly.dev/api/milestones/${this.milestoneId}`,
+          `https://child-development-backend.fly.dev/api/milestones/${this.milestoneId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

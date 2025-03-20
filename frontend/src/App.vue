@@ -74,6 +74,7 @@ export default {
 };
 </script>
 
+
 <style lang="scss" scoped>
 $primary-color: #007bff;
 $hover-primary: #0056b3;

@@ -7,107 +7,63 @@
     </div>
 
     <form @submit.prevent="registerChild">
-      <input
-        type="text"
-        v-model="name"
-        placeholder="Ime deteta"
-        required
-        @blur="validateName"
-      />
-      <div v-if="nameError" class="error-message">{{ nameError }}</div>
-
-      <input
-        type="date"
-        v-model="birthdate"
-        required
-        @blur="validateBirthdate"
-      />
-      <div v-if="birthdateError" class="error-message">{{ birthdateError }}</div>
-
-      <button type="submit" :disabled="hasErrors">Registruj Dete</button>
+      <input type="text" v-model="name" placeholder="Ime deteta" required />
+      <input type="date" v-model="birthdate" required />
+      <button type="submit">Registruj Dete</button>
     </form>
-
-    <div class="dashboard-link">
-      <router-link to="/dashboard">Idi na Dashboard</router-link>
-    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   data() {
     return {
       name: '',
       birthdate: '',
-      developmentStage: '', // Optional field
       errorMessage: '',
-      nameError: null,
-      birthdateError: null,
-      hasErrors: false
     };
   },
 
   methods: {
-    validateName() {
-      if (!this.name.trim()) {
-        this.nameError = "Ime deteta je obavezno.";
-        this.hasErrors = true;
-      } else {
-        this.nameError = null;
-      }
-    },
-
-    validateBirthdate() {
-      if (!this.birthdate) {
-        this.birthdateError = "Datum rođenja deteta je obavezan.";
-        this.hasErrors = true;
-      } else {
-        this.birthdateError = null;
-      }
-    },
-
     async registerChild() {
-      this.hasErrors = false; 
-      this.validateName();
-      this.validateBirthdate();
-
-      if (this.hasErrors) {
+      
+      if (!this.name || !this.birthdate) {
+        this.errorMessage = 'Ime i datum su obavezni.';
         return;
       }
 
+      const formattedBirthdate = new Date(this.birthdate).toISOString();
+
       try {
         const response = await axios.post(
-          'https://child-development-backend.fly.dev/api/',
-          {
-            name: this.name,
-            birthDate: this.birthdate, 
-            developmentStage: this.developmentStage || 'Not specified' 
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-            }
-          }
+          'https://child-development-backend.fly.dev/api', 
+          { name: this.name, birthDate: formattedBirthdate }, 
+          { headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } }
         );
 
         if (response.data) {
-          console.log('Child registered successfully:', response.data);
+          const authStore = useAuthStore(); 
+          authStore.addChildId(response.data._id);
           this.$router.push('/dashboard'); 
         }
+
+        
       } catch (error) {
-        console.error('Error during child registration:', error);
-        if (error.response) {
-          this.errorMessage = error.response.data.message || 'Došlo je do greške pri registraciji deteta';
-        } else {
-          this.errorMessage = 'Došlo je do greške pri povezivanju sa serverom';
+        if (process.env.NODE_ENV === 'production') {
+          console.error("❌ Error registering child:", error); 
         }
+        this.errorMessage = 'Došlo je do greške pri registraciji deteta.'; 
       }
     }
   }
 };
 </script>
+
+
+
 
 
 <style lang="scss" scoped>

@@ -1,15 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); 
+const cors = require('cors');
 const bodyParser = require('body-parser');
-const userRoutes = require('./routes/userRoutes'); 
+const userRoutes = require('./routes/userRoutes');
 const milestoneRoutes = require('./routes/milestoneRoutes');
 const childRoutes = require('./routes/childRoutes');
-const developmentRoutes = require('./routes/developmentRoutes');  
+const developmentRoutes = require('./routes/developmentRoutes');
 
 const app = express();
-const port = process.env.PORT || 5000; 
+const port = process.env.PORT || 5000;
+
 
 const allowedOrigins = [
   'https://temeljna-knjizica.fly.dev', 
@@ -28,43 +29,42 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions)); 
-app.use(bodyParser.json()); 
-app.use(express.json()); 
+app.use(bodyParser.json());
+app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/milestones', milestoneRoutes);
-app.use('/api', childRoutes); 
-app.use('/api/child-development', developmentRoutes);  
+app.use('/api', childRoutes);
+app.use('/api/child-development', developmentRoutes);
 
-app.get("/", (req, res) => {
-  res.send("✅ Backend radi na Fly.io!");
+app.get('/', (req, res) => {
+  res.send('✅ Backend radi na Fly.io!');
 });
 
 if (!process.env.MONGO_URI) {
-  console.error("❌ MONGO_URI nije definisan u promenljivama okruženja!");
+  console.error('❌ MONGO_URI nije definisan u promenljivama okruženja!');
   process.exit(1);
 }
 
-
 if (process.env.NODE_ENV !== 'production') {
-  console.log("🔄 Povezivanje sa MongoDB...");
+  console.log('🔄 Povezivanje sa MongoDB...');
 }
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  dbName: 'ChildTracker' 
-})
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: 'ChildTracker',
+  })
   .then(() => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('✅ Uspešno povezivanje sa MongoDB Atlasom');
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('❌ Greška pri povezivanju sa MongoDB:', err);
-    process.exit(1); 
+    process.exit(1);
   });
-
 
 app.listen(port, '0.0.0.0', () => {
   if (process.env.NODE_ENV !== 'production') {

@@ -41,7 +41,7 @@ router.get('/', protect, async (req, res) => {
       if (process.env.NODE_ENV !== 'production') {
         console.log("No children found for user:", req.user.id);
       }
-      return res.status(404).json({ message: "No children found" });
+      return res.json([]);
     }
 
     

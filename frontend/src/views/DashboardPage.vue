@@ -20,6 +20,7 @@
           <router-link :to="`/child-overview/${currentChild._id}`" class="dashboard-link">Pregled sve Dece</router-link>
         </div>
       </div>
+
       <div class="register-another-child">
         <router-link to="/child-registration" class="dashboard-link">Registruj Još Jedno Dete</router-link>
       </div>
@@ -46,7 +47,7 @@ export default {
 
     const fetchCurrentChild = async () => {
       try {
-        let childId = authStore.childId; 
+        const childId = authStore.childId;
 
         if (!childId) {
           errorMessage.value = "Nema registrovanog deteta. Molimo registrujte dete.";
@@ -59,7 +60,6 @@ export default {
 
         currentChild.value = response.data;
 
-        
         if (process.env.NODE_ENV !== 'production') {
           console.log("Fetched current child:", response.data);
         }
@@ -78,7 +78,6 @@ export default {
 
     watch(() => authStore.childId, async (newChildId) => {
       if (newChildId) {
-        
         if (process.env.NODE_ENV !== 'production') {
           console.log("🔄 Detected child change, refreshing data...");
         }
@@ -94,6 +93,7 @@ export default {
   }
 };
 </script>
+
 
 
 

@@ -20,7 +20,10 @@ export const useAuthStore = defineStore('auth', {
         return;
       }
 
-      console.log("🔑 Čuvanje tokena u authStore:", token);
+      if (process.env.NODE_ENV === 'production') {
+        console.log("🔑 Čuvanje tokena u authStore:", token);
+      }
+
       this.isAuthenticated = true;
       this.token = token;
       sessionStorage.setItem('token', token); 

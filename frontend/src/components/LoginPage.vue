@@ -1,11 +1,6 @@
 <template>
   <div class="login-container">
     <h2>Prijavite se</h2>
-
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
     <form @submit.prevent="loginUser">
       <input type="email" v-model="email" placeholder="Email" required />
       <div class="password-container">
@@ -17,11 +12,14 @@
       <button type="submit">Prijavite se</button>
     </form>
 
-    <div class="signup-link">
-      <p>Nemate nalog? <button @click="navigateToSignup">Registrujte se</button></p>
+
+    <div v-if="showRegisterButton" class="register-button-container">
+      <p>Nema registrovane dece. Molimo vas da registrujete dete.</p>
+      <button @click="redirectToChildRegistration">Registrujte dete</button>
     </div>
   </div>
 </template>
+
 
 <script>
 import { useAuthStore } from '@/stores/authStore';
@@ -34,14 +32,12 @@ export default {
       password: '',
       passwordVisible: false,
       errorMessage: '',
+      showRegisterButton: false, 
     };
   },
   methods: {
     async loginUser() {
       try {
-        const authStore = useAuthStore();
-
-        
         const loginResponse = await axios.post('https://child-development-backend.fly.dev/api/users/login', {
           email: this.email,
           password: this.password,
@@ -49,47 +45,31 @@ export default {
 
         const token = loginResponse.data.token;
         sessionStorage.setItem('token', token);
+
+        const authStore = useAuthStore();
         authStore.login(token);
 
-      
         const childrenResponse = await axios.get('https://child-development-backend.fly.dev/api', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (childrenResponse.data && childrenResponse.data.length > 0) {
-          const userChild = childrenResponse.data[0]; 
-          console.log("✅ Logged-in user has child:", userChild);
-
-          if (userChild && userChild._id) {
-            authStore.childIds = childrenResponse.data.map(child => child._id);
-            authStore.setCurrentChildId(userChild._id);
-            sessionStorage.setItem('childIds', JSON.stringify(authStore.childIds));
-            this.$router.push('/dashboard');
-          } else {
-            console.warn("⚠️ No valid child found. Redirecting to registration.");
-            authStore.childIds = [];
-            authStore.currentChildId = null;
-            sessionStorage.removeItem('childIds');
-            sessionStorage.removeItem('childId');
-            this.$router.push('/child-registration');
-          }
+          const userChild = childrenResponse.data[0];
+          authStore.addChildId(userChild._id);
+          this.$router.push('/dashboard');
         } else {
-          console.warn("⚠️ No children found. Redirecting to registration.");
-          authStore.childIds = [];
-          authStore.currentChildId = null;
-          sessionStorage.removeItem('childIds');
-          sessionStorage.removeItem('childId');
-          this.$router.push('/child-registration');
+          console.log('No children found, showing register button.');
+          this.showRegisterButton = true; 
         }
       } catch (error) {
-        console.error("❌ Login error:", error);
-        this.errorMessage = error.response?.data?.message || "Pogrešan email ili lozinka.";
+        console.error('❌ Login error:', error);
+        this.errorMessage = error.response?.data?.message || 'Pogrešan email ili lozinka.';
       }
     },
-    navigateToSignup() {
-      this.$router.push('/');
-    }
-  }
+    redirectToChildRegistration() {
+      this.$router.push('/child-registration');
+    },
+  },
 };
 </script>
 
@@ -187,6 +167,36 @@ label {
 
     &:hover {
       color: $primary-hover;
+    }
+  }
+}
+
+.register-button-container {
+  margin-top: 20px;
+  text-align: center;
+
+  p {
+    margin-bottom: 10px;
+    color: $text-color;
+    font-size: 16px;
+  }
+
+  button {
+    background-color: $primary-color;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+
+    &:focus {
+      outline: none;
     }
   }
 }

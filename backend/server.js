@@ -1,34 +1,36 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
 const milestoneRoutes = require('./routes/milestoneRoutes');
 const childRoutes = require('./routes/childRoutes');
 const developmentRoutes = require('./routes/developmentRoutes');
 
+
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 5000;
 
-
 const allowedOrigins = [
-  'https://temeljna-knjizica.fly.dev', 
-  'http://localhost:8080', 
+  'https://temeljna-knjizica.fly.dev',
+  'http://localhost:8080',
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Nije dozvoljeno od strane CORS-a'));
     }
   },
-  credentials: true, 
+  credentials: true,
 };
 
-app.use(cors(corsOptions)); 
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -36,6 +38,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/milestones', milestoneRoutes);
 app.use('/api', childRoutes);
 app.use('/api/child-development', developmentRoutes);
+
 
 app.get('/', (req, res) => {
   res.send('✅ Backend radi na Fly.io!');
@@ -66,7 +69,7 @@ mongoose
     process.exit(1);
   });
 
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(`✅ Server is running on port ${port}`);
   }

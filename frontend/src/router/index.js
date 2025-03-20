@@ -11,6 +11,7 @@ import ChildDevelopmentList from '@/components/ChildDevelopmentList.vue';
 import ChildDevelopmentPeriod from '../components/ChildDevelopmentPeriod.vue';
 import ChildRegistrationForm from '../components/ChildRegistrationForm.vue';
 import ChildOverview from '../components/ChildOverview.vue';
+import DevelopmentInfoPage from '../components/DevelopmentInfoPage.vue';
 
 const routes = [
   { 
@@ -105,7 +106,17 @@ const routes = [
     path: '/child-development-list/:childId',
     name: 'ChildDevelopmentList',
     component: ChildDevelopmentList
-  }
+  },
+
+  {
+    path: '/development-info',
+    component: DevelopmentInfoPage,
+    name: 'development-info',
+    meta: { requiresAuth: true } 
+  },
+  
+
+
 ];
 
 const router = createRouter({

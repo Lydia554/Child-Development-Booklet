@@ -18,6 +18,7 @@
           <router-link :to="`/child-development-form/${currentChild._id}`" class="dashboard-link">Unos razvoja deteta</router-link>
           <router-link :to="`/child-development-list/${currentChild._id}`" class="dashboard-link">Pregled razvoja</router-link>
           <router-link :to="`/child-overview/${currentChild._id}`" class="dashboard-link">Pregled sve Dece</router-link>
+          <router-link to="/development-info" class="dashboard-link">Razvoj i saveti</router-link>
         </div>
       </div>
 

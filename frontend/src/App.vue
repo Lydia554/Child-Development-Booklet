@@ -14,6 +14,7 @@
         <router-link :to="`/child-development-form/${childId}`">Unos razvoja deteta</router-link>
         <router-link :to="`/child-development-list/${childId}`">Pregled razvoja</router-link>
         <router-link :to="`/child-overview/${childId}`">Pregled sve Dece</router-link>
+        <router-link to="/development-info">Razvoj i saveti</router-link>
       </template>
 
       <!-- Auth links -->

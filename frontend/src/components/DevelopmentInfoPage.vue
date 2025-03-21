@@ -4,17 +4,33 @@
       v-for="(period, index) in developmentData"
       :key="index"
       class="development-card"
-      :class="`period-${index % 4}`"
+      :class="[
+        `period-${index % 4}`,
+        expandedCardIndex === index ? 'expanded' : '',
+        expandedCardIndex !== null && expandedCardIndex !== index ? 'blurred' : ''
+      ]"
+      @click="toggleCard(index)"
     >
       <h2>{{ period.ageRange }}</h2>
 
+      <blockquote class="emotional-note">
+        🧸 Svako dete se razvija svojim tempom. Podstičite ga s ljubavlju i pažnjom.
+      </blockquote>
+
       <div
-        v-for="milestone in period.milestones"
-        :key="milestone.category"
-        class="development-section"
-        :class="milestone.category.toLowerCase().replace(/\s/g, '-')"
+        v-for="(milestone, idx) in period.milestones"
+        :key="milestone.category + idx"
+        class="development-section milestone"
+        :class="[
+          milestone.category.toLowerCase().replace(/\s/g, '-'),
+          (!isMobile || expandedSection === `${index}-${idx}`) ? 'open' : ''
+        ]"
+        @click.stop="handleSectionClick(`${index}-${idx}`)"
       >
-        <h3>{{ milestone.category }}</h3>
+        <h3>
+          <span class="icon">{{ getIconForCategory(milestone.category) }}</span>
+          {{ milestone.category }}
+        </h3>
         <p>{{ milestone.description }}</p>
       </div>
 
@@ -31,20 +47,19 @@
       <div v-if="period.generalTips?.length" class="development-section general-tips">
         <h3>💡 Opšti saveti</h3>
         <ul>
-          <li v-for="(tip, idx) in period.generalTips" :key="idx">{{ tip }}</li>
+          <li v-for="(tip, idx) in period.generalTips" :key="idx">✅ {{ tip }}</li>
         </ul>
       </div>
 
       <div v-if="period.suggestedActivities?.length" class="development-section suggested-activities">
         <h3>🎲 Predložene aktivnosti</h3>
         <ul>
-          <li v-for="(activity, idx) in period.suggestedActivities" :key="idx">{{ activity }}</li>
+          <li v-for="(activity, idx) in period.suggestedActivities" :key="idx">🎈 {{ activity }}</li>
         </ul>
       </div>
     </div>
   </div>
 </template>
-
 
   
   <script>
@@ -52,6 +67,8 @@
     data() {
       return {
         loading: false,
+        expandedSection: null,
+        isMobile: false,
         developmentData: [
           {
             ageRange: "0-6 meseci",
@@ -282,167 +299,180 @@
               "Organizujte igre koje uključuju preskakanje prepreka kako biste poboljšali koordinaciju.",
               "Koristite igre memorije koje uključuju prepoznavanje slova i brojeva.",
               "Pružite detetu priliku da učestvuje u timskim sportovima ili grupnim igrama kako bi razvilo osećaj saradnje."
-            ]
-          }
-        ]
+            ],
+          },
+        ],
       };
+    },
+
+
+    mounted() {
+  this.isMobile = window.innerWidth <= 768;
+  console.log('isMobile:', this.isMobile); // 👈 ovo dodaj
+  window.addEventListener("resize", this.updateMobile);
+},
+
+  beforeUnmount() {
+  window.removeEventListener("resize", this.updateMobile);
+},
+
+  methods: {
+    getIconForCategory(category) {
+      const icons = {
+        "Fizički razvoj": "🤸",
+        "Govor i jezik": "🗣️",
+        "Socijalno-emocionalni razvoj": "💞",
+        "Opservacija": "🔍"
+      };
+      return icons[category] || "📌";
+    },
+ 
+    handleSectionClick(key) {
+  if (!this.isMobile) return;
+  console.log('Clicked:', key);
+  this.expandedSection = this.expandedSection === key ? null : key;
+},
+
+    updateMobile() {
+      this.isMobile = window.innerWidth <= 768;
     }
-  };
+  }
+};
+
+  
 </script>
 
 
   
 <style scoped lang="scss">
-
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 .development-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 30px;
   padding: 30px;
   max-width: 900px;
   margin: 0 auto;
-  background-color: #f4f7fb;
+  background-color: #fffaf6;
   font-family: 'Roboto', sans-serif;
 }
 
 .development-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   width: 100%;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
-    background-color: #f9fbfd;
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
   }
 
   h2 {
-    font-size: 2.1em;
-    color: #2c3e50;
-    margin-bottom: 20px;
+    font-size: 2em;
+    color: #3e3e3e;
     text-align: center;
-    font-weight: 700;
+    margin-bottom: 20px;
   }
 
-  &.period-0 { background-color: #e8f4fd; }
-  &.period-1 { background-color: #eafaf1; }
-  &.period-2 { background-color: #fff4e6; }
-  &.period-3 { background-color: #fdecea; }
+  &.period-0 { background-color: #fff1f0; }
+  &.period-1 { background-color: #f1fff5; }
+  &.period-2 { background-color: #fffce6; }
+  &.period-3 { background-color: #e8f0ff; }
 }
 
 .development-section {
-  margin-bottom: 25px;
+  background: #ffffff;
+  border-left: 6px solid #ccc;
+  border-radius: 12px;
+  margin-bottom: 20px;
   padding: 20px;
-  border-left: 6px solid #5dade2;
-  border-radius: 10px;
-  background-color: #fefefe;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-
-  &:hover {
-    background-color: #edf6fd;
-  }
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: max-height 0.4s ease;
 
   h3 {
-    font-size: 1.25em;
+    font-size: 1.2em;
     font-weight: 600;
     margin-bottom: 10px;
-    color: #2980b9;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-right: 8px;
+      font-size: 1.3em;
+    }
   }
 
-  p, ul {
+  p, li {
     font-size: 1.05em;
-    line-height: 1.7;
-    color: #444;
-  }
-
-  ul {
-    padding-left: 20px;
-    list-style: disc;
+    line-height: 1.6;
+    color: #333;
   }
 }
 
-/* Dinamičke klase po kategorijama */
-.fizički-razvoj {
-  border-left-color: #4caf50;
-  h3 { color: #2e7d32; }
+.development-section.milestone:not(.open) p,
+.development-section.milestone:not(.open) ul {
+  display: none;
 }
 
-.govor-i-jezik,
-.govor-i-jezik {
-  border-left-color: #2196f3;
-  h3 { color: #1565c0; }
-}
-
-.socijalno-emocionalni-razvoj {
-  border-left-color: #f06292;
-  h3 { color: #ad1457; }
-}
-
-.opservacija {
-  border-left-color: #ffb74d;
-  h3 { color: #ef6c00; }
-}
-
-.concers,
-.general-tips,
-.suggested-activities {
-  border-left-color: #9e9e9e;
-  h3 { color: #616161; }
-}
 
 .development-advice {
+  background-color: #e3f2fd;
   padding: 20px;
-  border-left: 6px solid #2e86c1;
-  background-color: #eaf4fc;
   border-radius: 10px;
-  margin-bottom: 25px;
+  border-left: 6px solid #0288d1;
+  margin-bottom: 20px;
 
   h3 {
-    color: #21618c;
     font-weight: 600;
-    font-size: 1.2em;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    color: #0277bd;
   }
 
   p {
     font-size: 1.05em;
-    line-height: 1.7;
-    color: #2e4053;
+    line-height: 1.6;
+    color: #2c3e50;
   }
+}
+
+blockquote.emotional-note {
+  font-style: italic;
+  background-color: #fff5f0;
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-left: 5px solid #f48fb1;
+  border-radius: 8px;
+  color: #a1405c;
+  font-size: 1em;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
-  .development-container {
-    padding: 15px;
+  .development-section {
+    cursor: pointer;
+    max-height: 60px;
   }
 
-  .development-card {
-    padding: 20px;
+  .development-section.open {
+    max-height: 1000px;
   }
 
-  .development-section,
-  .development-advice {
-    padding: 15px;
+  .development-section::after {
+    content: '⬇️ Dodirni za više';
+    display: block;
+    text-align: right;
+    color: #aaa;
+    font-size: 0.85em;
+    margin-top: 10px;
   }
 
-  h2 {
-    font-size: 1.6em;
-  }
-
-  h3 {
-    font-size: 1.1em;
-  }
-
-  p, ul {
-    font-size: 0.95em;
+  .development-section.open::after {
+    content: '⬆️ Dodirni da sakriješ';
   }
 }
-
-
 </style>

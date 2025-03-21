@@ -1,34 +1,51 @@
 <template>
-    <div class="development-container">
-      <div v-for="(period, index) in developmentData" :key="index" class="development-card">
-        <h2>{{ period.ageRange }}</h2>
-        <div class="development-section" v-for="milestone in period.milestones" :key="milestone.category">
-          <h3>{{ milestone.category }}</h3>
-          <p>{{ milestone.description }}</p>
-        </div>
-        <div class="development-advice">
-          <h3>🔹 Savet</h3>
-          <p>{{ period.advice }}</p>
-        </div>
-        <div class="development-section">
-          <h3>❓ Šta ako dete ne dostigne ove prekretnice?</h3>
-          <p>{{ period.concerns }}</p>
-        </div>
-        <div class="development-section">
-          <h3>💡 Opšti saveti</h3>
-          <ul>
-            <li v-for="(tip, idx) in period.generalTips" :key="idx">{{ tip }}</li>
-          </ul>
-        </div>
-        <div class="development-section">
-          <h3>🎲 Predložene aktivnosti</h3>
-          <ul>
-            <li v-for="(activity, idx) in period.suggestedActivities" :key="idx">{{ activity }}</li>
-          </ul>
-        </div>
+  <div class="development-container">
+    <div
+      v-for="(period, index) in developmentData"
+      :key="index"
+      class="development-card"
+      :class="`period-${index % 4}`"
+    >
+      <h2>{{ period.ageRange }}</h2>
+
+      <div
+        v-for="milestone in period.milestones"
+        :key="milestone.category"
+        class="development-section"
+        :class="milestone.category.toLowerCase().replace(/\s/g, '-')"
+      >
+        <h3>{{ milestone.category }}</h3>
+        <p>{{ milestone.description }}</p>
+      </div>
+
+      <div v-if="period.advice" class="development-advice">
+        <h3>🔹 Savet</h3>
+        <p>{{ period.advice }}</p>
+      </div>
+
+      <div v-if="period.concerns" class="development-section concerns">
+        <h3>❓ Šta ako dete ne dostigne ove prekretnice?</h3>
+        <p>{{ period.concerns }}</p>
+      </div>
+
+      <div v-if="period.generalTips?.length" class="development-section general-tips">
+        <h3>💡 Opšti saveti</h3>
+        <ul>
+          <li v-for="(tip, idx) in period.generalTips" :key="idx">{{ tip }}</li>
+        </ul>
+      </div>
+
+      <div v-if="period.suggestedActivities?.length" class="development-section suggested-activities">
+        <h3>🎲 Predložene aktivnosti</h3>
+        <ul>
+          <li v-for="(activity, idx) in period.suggestedActivities" :key="idx">{{ activity }}</li>
+        </ul>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
+
   
   <script>
   export default {
@@ -276,55 +293,156 @@
 
   
 <style scoped lang="scss">
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 .development-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 30px;
   padding: 30px;
   max-width: 900px;
   margin: 0 auto;
+  background-color: #f4f7fb;
+  font-family: 'Roboto', sans-serif;
 }
 
 .development-card {
-  background: #f9f9f9;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 20px;
   padding: 30px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  font-size: 1.2em;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+    background-color: #f9fbfd;
+  }
+
+  h2 {
+    font-size: 2.1em;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  &.period-0 { background-color: #e8f4fd; }
+  &.period-1 { background-color: #eafaf1; }
+  &.period-2 { background-color: #fff4e6; }
+  &.period-3 { background-color: #fdecea; }
 }
 
 .development-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: #fff;
-  border-left: 5px solid #007bff;
-  border-radius: 5px;
+  margin-bottom: 25px;
+  padding: 20px;
+  border-left: 6px solid #5dade2;
+  border-radius: 10px;
+  background-color: #fefefe;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background-color: #edf6fd;
+  }
+
+  h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #2980b9;
+  }
+
+  p, ul {
+    font-size: 1.05em;
+    line-height: 1.7;
+    color: #444;
+  }
+
+  ul {
+    padding-left: 20px;
+    list-style: disc;
+  }
+}
+
+/* Dinamičke klase po kategorijama */
+.fizički-razvoj {
+  border-left-color: #4caf50;
+  h3 { color: #2e7d32; }
+}
+
+.govor-i-jezik,
+.govor-i-jezik {
+  border-left-color: #2196f3;
+  h3 { color: #1565c0; }
+}
+
+.socijalno-emocionalni-razvoj {
+  border-left-color: #f06292;
+  h3 { color: #ad1457; }
+}
+
+.opservacija {
+  border-left-color: #ffb74d;
+  h3 { color: #ef6c00; }
+}
+
+.concers,
+.general-tips,
+.suggested-activities {
+  border-left-color: #9e9e9e;
+  h3 { color: #616161; }
 }
 
 .development-advice {
-  background: #e3f2fd;
   padding: 20px;
-  border-radius: 5px;
-  border-left: 5px solid #0288d1;
+  border-left: 6px solid #2e86c1;
+  background-color: #eaf4fc;
+  border-radius: 10px;
+  margin-bottom: 25px;
+
+  h3 {
+    color: #21618c;
+    font-weight: 600;
+    font-size: 1.2em;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 1.05em;
+    line-height: 1.7;
+    color: #2e4053;
+  }
 }
 
 @media (max-width: 768px) {
   .development-container {
     padding: 15px;
-    max-width: 100%;
   }
+
   .development-card {
     padding: 20px;
-    font-size: 1em;
   }
-  .development-section {
-    padding: 10px;
-  }
+
+  .development-section,
   .development-advice {
     padding: 15px;
   }
+
+  h2 {
+    font-size: 1.6em;
+  }
+
+  h3 {
+    font-size: 1.1em;
+  }
+
+  p, ul {
+    font-size: 0.95em;
+  }
 }
+
+
 </style>

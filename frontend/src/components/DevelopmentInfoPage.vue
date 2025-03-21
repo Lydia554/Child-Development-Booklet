@@ -1,74 +1,54 @@
 <template>
-  <div class="development-container">
-    <div
-      v-for="(period, index) in developmentData"
-      :key="index"
-      class="development-card"
-      :class="[
-        `period-${index % 4}`,
-        expandedCardIndex === index ? 'expanded' : '',
-        expandedCardIndex !== null && expandedCardIndex !== index ? 'blurred' : ''
-      ]"
-      @click="toggleCard(index)"
-    >
-      <h2>{{ period.ageRange }}</h2>
+  <div class="book-wrapper">
+    <button class="nav-button left" @click="prevPage" :disabled="currentPage === 0">⬅</button>
 
-      <blockquote class="emotional-note">
-        🧸 Svako dete se razvija svojim tempom. Podstičite ga s ljubavlju i pažnjom.
-      </blockquote>
+    <div class="book-page" :class="{ flipping: isFlipping }">
+      <transition name="page-flip" mode="out-in">
+        <div class="development-card" :key="currentPage">
+          <h2>{{ current.ageRange }}</h2>
+          <blockquote class="emotional-note">🧸 Svako dete se razvija svojim tempom...</blockquote>
 
-      <div
-        v-for="(milestone, idx) in period.milestones"
-        :key="milestone.category + idx"
-        class="development-section milestone"
-        :class="[
-          milestone.category.toLowerCase().replace(/\s/g, '-'),
-          (!isMobile || expandedSection === `${index}-${idx}`) ? 'open' : ''
-        ]"
-        @click.stop="handleSectionClick(`${index}-${idx}`)"
-      >
-        <h3>
-          <span class="icon">{{ getIconForCategory(milestone.category) }}</span>
-          {{ milestone.category }}
-        </h3>
-        <p>{{ milestone.description }}</p>
-      </div>
+          <div v-for="(milestone, idx) in current.milestones" :key="idx" class="development-section open">
+            <h3><span class="icon">{{ getIconForCategory(milestone.category) }}</span>{{ milestone.category }}</h3>
+            <p>{{ milestone.description }}</p>
+          </div>
 
-      <div v-if="period.advice" class="development-advice">
-        <h3>🔹 Savet</h3>
-        <p>{{ period.advice }}</p>
-      </div>
+          <div v-if="current.advice" class="development-advice">
+            <h3>🔹 Savet</h3>
+            <p>{{ current.advice }}</p>
+          </div>
 
-      <div v-if="period.concerns" class="development-section concerns">
-        <h3>❓ Šta ako dete ne dostigne ove prekretnice?</h3>
-        <p>{{ period.concerns }}</p>
-      </div>
+          <div v-if="current.concerns" class="development-section concerns">
+            <h3>❓ Šta ako dete ne dostigne ove prekretnice?</h3>
+            <p>{{ current.concerns }}</p>
+          </div>
 
-      <div v-if="period.generalTips?.length" class="development-section general-tips">
-        <h3>💡 Opšti saveti</h3>
-        <ul>
-          <li v-for="(tip, idx) in period.generalTips" :key="idx">✅ {{ tip }}</li>
-        </ul>
-      </div>
+          <div v-if="current.generalTips?.length" class="development-section general-tips">
+            <h3>💡 Opšti saveti</h3>
+            <ul><li v-for="(tip, i) in current.generalTips" :key="i">✅ {{ tip }}</li></ul>
+          </div>
 
-      <div v-if="period.suggestedActivities?.length" class="development-section suggested-activities">
-        <h3>🎲 Predložene aktivnosti</h3>
-        <ul>
-          <li v-for="(activity, idx) in period.suggestedActivities" :key="idx">🎈 {{ activity }}</li>
-        </ul>
-      </div>
+          <div v-if="current.suggestedActivities?.length" class="development-section suggested-activities">
+            <h3>🎲 Predložene aktivnosti</h3>
+            <ul><li v-for="(activity, i) in current.suggestedActivities" :key="i">🎈 {{ activity }}</li></ul>
+          </div>
+        </div>
+      </transition>
     </div>
+
+    <button class="nav-button right" @click="nextPage" :disabled="currentPage === developmentData.length - 1">➡</button>
   </div>
 </template>
+
 
   
   <script>
   export default {
     data() {
       return {
-        loading: false,
-        expandedSection: null,
-        isMobile: false,
+       
+        currentPage: 0,
+    isFlipping: false,
         developmentData: [
           {
             ageRange: "0-6 meseci",
@@ -306,37 +286,39 @@
     },
 
 
-    mounted() {
-  this.isMobile = window.innerWidth <= 768;
-  console.log('isMobile:', this.isMobile); // 👈 ovo dodaj
-  window.addEventListener("resize", this.updateMobile);
-},
-
-  beforeUnmount() {
-  window.removeEventListener("resize", this.updateMobile);
-},
-
-  methods: {
-    getIconForCategory(category) {
-      const icons = {
-        "Fizički razvoj": "🤸",
-        "Govor i jezik": "🗣️",
-        "Socijalno-emocionalni razvoj": "💞",
-        "Opservacija": "🔍"
-      };
-      return icons[category] || "📌";
-    },
- 
-    handleSectionClick(key) {
-  if (!this.isMobile) return;
-  console.log('Clicked:', key);
-  this.expandedSection = this.expandedSection === key ? null : key;
-},
-
-    updateMobile() {
-      this.isMobile = window.innerWidth <= 768;
-    }
+    computed: {
+  current() {
+    return this.developmentData[this.currentPage];
   }
+},
+methods: {
+  nextPage() {
+    if (this.currentPage < this.developmentData.length - 1) {
+      this.flipPage(() => this.currentPage++);
+    }
+  },
+  prevPage() {
+    if (this.currentPage > 0) {
+      this.flipPage(() => this.currentPage--);
+    }
+  },
+  flipPage(callback) {
+    this.isFlipping = true;
+    setTimeout(() => {
+      callback();
+      this.isFlipping = false;
+    }, 400);
+  },
+  getIconForCategory(category) {
+    const icons = {
+      "Fizički razvoj": "🤸",
+      "Govor i jezik": "🗣️",
+      "Socijalno-emocionalni razvoj": "💞",
+      "Opservacija": "🔍"
+    };
+    return icons[category] || "📌";
+  }
+}
 };
 
   
@@ -347,15 +329,50 @@
 <style scoped lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-.development-container {
+.book-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding: 30px;
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #fffaf6;
-  font-family: 'Roboto', sans-serif;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: #fffaf6;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  background: #ffd6d6;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5em;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover:not(:disabled) {
+    background: #ffbaba;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.book-page {
+  perspective: 1500px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.page-flip-enter-active,
+.page-flip-leave-active {
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.page-flip-enter-from,
+.page-flip-leave-to {
+  transform: rotateY(180deg);
 }
 
 .development-card {
@@ -363,80 +380,28 @@
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  h2 {
-    font-size: 2em;
-    color: #3e3e3e;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  &.period-0 { background-color: #fff1f0; }
-  &.period-1 { background-color: #f1fff5; }
-  &.period-2 { background-color: #fffce6; }
-  &.period-3 { background-color: #e8f0ff; }
+  font-family: 'Roboto', sans-serif;
 }
 
-.development-section {
-  background: #ffffff;
-  border-left: 6px solid #ccc;
-  border-radius: 12px;
+h2 {
+  font-size: 2em;
+  color: #3e3e3e;
+  text-align: center;
   margin-bottom: 20px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
-  transition: max-height 0.4s ease;
+}
+
+.development-section, .development-advice {
+  margin-bottom: 20px;
 
   h3 {
-    font-size: 1.2em;
     font-weight: 600;
     margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-
-    .icon {
-      margin-right: 8px;
-      font-size: 1.3em;
-    }
   }
 
   p, li {
     font-size: 1.05em;
     line-height: 1.6;
     color: #333;
-  }
-}
-
-.development-section.milestone:not(.open) p,
-.development-section.milestone:not(.open) ul {
-  display: none;
-}
-
-
-.development-advice {
-  background-color: #e3f2fd;
-  padding: 20px;
-  border-radius: 10px;
-  border-left: 6px solid #0288d1;
-  margin-bottom: 20px;
-
-  h3 {
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #0277bd;
-  }
-
-  p {
-    font-size: 1.05em;
-    line-height: 1.6;
-    color: #2c3e50;
   }
 }
 
@@ -453,26 +418,31 @@ blockquote.emotional-note {
 }
 
 @media (max-width: 768px) {
-  .development-section {
-    cursor: pointer;
-    max-height: 60px;
+  .book-wrapper {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .development-section.open {
-    max-height: 1000px;
+  .nav-button {
+    font-size: 1.2em;
+    padding: 8px 12px;
+    align-self: center;
   }
 
-  .development-section::after {
-    content: '⬇️ Dodirni za više';
-    display: block;
-    text-align: right;
-    color: #aaa;
-    font-size: 0.85em;
-    margin-top: 10px;
+  .development-card {
+    padding: 20px;
   }
 
-  .development-section.open::after {
-    content: '⬆️ Dodirni da sakriješ';
+  h2 {
+    font-size: 1.6em;
+  }
+
+  .development-section h3, .development-advice h3 {
+    font-size: 1.1em;
+  }
+
+  .development-section p, .development-advice p, li {
+    font-size: 1em;
   }
 }
 </style>
